@@ -30,6 +30,8 @@ time_step = current step in time
 There is a chance t every time_step that the paramount chief dies, 
 resulting in peacful annexation of a random set of subordinate polities
 
+if a polity has been warred against or seceded from, they can not be a target for war until the next year.
+when polities secede, they should acquire a portion of the resources of the chief polity (MAYBE)
 
 */
 
@@ -75,7 +77,7 @@ const generatePolities = (amount) => {
 
 const makeDecision = (polity, all_polities) => {
   let victim = findWeakestNeighborPolity(polity, all_polities)
-  console.log('VICTIM', victim)
+  // console.log('VICTIM', victim)
   if (victim && willGoToWar(polity, victim, all_polities)) {
     goToWar(polity, victim, null, all_polities)
   } else {
@@ -140,6 +142,8 @@ const reorganizeInternalPolities = (polity) => {
 }
 
 const annexTarget = (chief, target, all_polities) => {
+  console.log('ANNEX: ', `${target.name} is annexed by ${chief.name}.`);
+  
   all_polities.forEach(p => {
     if (p.id === target.id) {
       p.chief = chief.id
@@ -168,11 +172,12 @@ const willSecede = (chief, subordinate, all_polities) => {
 }
 
 const attemptRebellion = (chief, subordinate, all_polities) => {
-  // console.log(subordinate);
+  console.log('REBELLION: ', `${subordinate.name} attempts rebellion against ${chief.name}.`);
   let probability_of_successful_attack = probabilityOfSuccessfulAttack(chief, subordinate, all_polities)
   let probability_to_repel_attack = 1 - probability_of_successful_attack
   const rebellion_succeeds = attackRepelled(probability_to_repel_attack)
   if (rebellion_succeeds) {
+    console.log('REBELLION: ', `${subordinate.name} succeeds.`);
     // chief.resource_level -= costOfUnsuccessfulAttack(probability_of_successful_attack)
     // subordinate.resource_level -= costOfUnsuccessfulAttack(probability_of_successful_attack)
     all_polities.forEach(p => {
@@ -183,6 +188,7 @@ const attemptRebellion = (chief, subordinate, all_polities) => {
     secede(subordinate, all_polities);
     reorganizeInternalPolities(chief)
   } else {
+    console.log('REBELLION: ', `${subordinate.name} fails.`);
     // chief.resource_level -= costOfSuccessfulAttack(probability_of_successful_attack)
     // subordinate.resource_level -= costOfSuccessfulAttack(probability_of_successful_attack)
     all_polities.forEach(p => {
@@ -194,6 +200,7 @@ const attemptRebellion = (chief, subordinate, all_polities) => {
 }
 
 const havePeace = (polity, all_polities) => {
+  console.log('PEACE: ', `${polity.name} has peace.`);
   all_polities.forEach(p => {
     if (p.id === polity.id) {
       p.resource_level += Math.sign(polity.baseline_resource_level - polity.resource_level) * (polity.baseline_resource_level / RESOURCE_RECOVERY_TIME)
@@ -203,7 +210,7 @@ const havePeace = (polity, all_polities) => {
 
 const goToWar = (attacker, defender, probability_to_repel_attack = null, all_polities) => {
   let target_community = findWealthiestBorderCommunity(attacker, defender, all_polities);
-  // console.log(defender);
+  console.log('WAR: ', `${attacker.name} prepares for war against ${defender.name}`);
   
   let probability_of_successful_attack = probabilityOfSuccessfulAttack(attacker, defender, all_polities)
   if(probability_to_repel_attack === null) {
@@ -211,6 +218,7 @@ const goToWar = (attacker, defender, probability_to_repel_attack = null, all_pol
   }
   const attack_succeeds = !attackRepelled(probability_to_repel_attack)
   if (attack_succeeds) {
+    console.log('WAR: ', `${attacker.name} succeeds in battle against ${target_community.name}`);
     all_polities.forEach(p => {
       if (p.id === attacker.id || p.id === defender.id) { 
         p.resource_level -= costOfSuccessfulAttack(probability_of_successful_attack)
@@ -222,9 +230,11 @@ const goToWar = (attacker, defender, probability_to_repel_attack = null, all_pol
     reorganizeInternalPolities(attacker)
     probability_to_repel_attack -= ((1 - LOSER_EFFECT) * probability_to_repel_attack)
     if (defender.chief) {
+      console.log('WAR: ', `${attacker.name}'s onslaught continues against ${defender.name}`);
       goToWar(attacker, defender, probability_to_repel_attack, all_polities)
     }
   } else {
+    console.log('WAR: ', `${attacker.name} fails in battle against ${target_community.name}`);
     all_polities.forEach(p => {
       if (p.id === attacker.id || p.id === defender.id) {
         p.resource_level -= costOfUnsuccessfulAttack(probability_of_successful_attack)
