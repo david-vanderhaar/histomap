@@ -33,6 +33,10 @@ resulting in peacful annexation of a random set of subordinate polities
 if a polity has been warred against or seceded from, they can not be a target for war until the next year.
 when polities secede, they should acquire a portion of the resources of the chief polity (MAYBE)
 
+find neighbors to attack should target any polities with range of current chief and any of their subordinates
+
+nest goToWar function uses undefined target
+
 */
 
 const TRIBUTE_LEVEL = 0.2 // Math.random();
@@ -43,18 +47,13 @@ const MILITARY_DETERMINISM = 2 //getRandomIntInclusive(1, 2);
 const WILLINGNESS_TO_ATTACK = 2
 const RESOURCE_RECOVERY_TIME =  5 //getRandomIntInclusive(5, 15);
 const GRID_SIZE = 100
-const NEIGHBOR_DISTANCE = GRID_SIZE
-// const NEIGHBOR_DISTANCE = GRID_SIZE / 5
+// const NEIGHBOR_DISTANCE = GRID_SIZE
+const NEIGHBOR_DISTANCE = GRID_SIZE / 5
 
 export const run = (steps_to_run) => {
 
   let polities = generatePolities(10);
   console.table(polities);
-  // console.log(polities[0].name);
-  // console.log(polities[1].name);
-  // let res = findWealthiestBorderCommunity(polities[0], polities[1], polities)
-  // console.log(res);
-  
   
   for (let i = 0; i < steps_to_run; i++) {
     polities
@@ -107,10 +106,25 @@ const findWeakestNeighborPolity = (polity, all_polities) => {
   return neighbor_chiefs.length > 0 ? neighbor_chiefs[0] : false;
 }
 
+const isInRange = (a, b) => {
+  return (
+    NEIGHBOR_DISTANCE >= Math.hypot(
+      b.coordinates.x - a.coordinates.x,
+      b.coordinates.y - a.coordinates.y
+    )
+  )
+}
+
 const getNeighborCommunities = (polity, all_polities) => {
+  let polity_or_subordinate_is_in_range = [
+    polity, 
+    ...getSubordinates(polity, all_polities)
+  ].reduce((acc, curr) => acc + isInRange(polity, curr), 
+    0
+  )
   return all_polities.filter((p) => {
     return (
-      NEIGHBOR_DISTANCE >= Math.hypot(p.coordinates.x - polity.coordinates.x, p.coordinates.y - polity.coordinates.y)
+      polity_or_subordinate_is_in_range
       && p.chief !== polity.id
       && p.id !== polity.id
     );
@@ -224,12 +238,10 @@ const goToWar = (attacker, defender, probability_to_repel_attack = null, all_pol
         p.resource_level -= costOfSuccessfulAttack(probability_of_successful_attack)
       }
     });
-    // attacker.resource_level -= costOfSuccessfulAttack(probability_of_successful_attack)
-    // defender.resource_level -= costOfSuccessfulAttack(probability_of_successful_attack)
     annexTarget(attacker, target_community, all_polities)
     reorganizeInternalPolities(attacker)
     probability_to_repel_attack -= ((1 - LOSER_EFFECT) * probability_to_repel_attack)
-    if (defender.chief) {
+    if (getSubordinates(defender, all_polities).length > 0) {
       console.log('WAR: ', `${attacker.name}'s onslaught continues against ${defender.name}`);
       goToWar(attacker, defender, probability_to_repel_attack, all_polities)
     }
@@ -240,8 +252,6 @@ const goToWar = (attacker, defender, probability_to_repel_attack = null, all_pol
         p.resource_level -= costOfUnsuccessfulAttack(probability_of_successful_attack)
       }
     });
-    // attacker.resource_level -= costOfUnsuccessfulAttack(probability_of_successful_attack)
-    // defender.resource_level -= costOfUnsuccessfulAttack(probability_of_successful_attack)
   }
 }
 
