@@ -50,43 +50,39 @@ const GRID_SIZE = 100
 // const NEIGHBOR_DISTANCE = GRID_SIZE
 const NEIGHBOR_DISTANCE = GRID_SIZE / 5
 
-export const run = (steps_to_run) => {
-
-  let polities = generatePolities(10);
-  console.table(polities);
-  
+export const run = (polities, steps_to_run) => {
   for (let i = 0; i < steps_to_run; i++) {
+    console.log(`%cTIME_STEP: ${i}`, "color: yellow; font-style: italic; background-color: blue;padding: 2px");
     polities
     .filter((polity) => polity.chief === null)
     .map((polity) => makeDecision(polity, polities));
-    // console.log('TIME_STEP: ', i);
   }
-  
-  console.table(polities);
+
+  return polities;  
 }
 
-const generatePolities = (amount) => {
+export const generatePolities = (amount) => {
   let polities = [];
   for (let i = 0; i < amount; i++) {
     polities.push(createPolity());
   }
-  // return Array(amount).fill('').map(createPolity());
   return polities;
 }
 
 const makeDecision = (polity, all_polities) => {
+  console.log('DECISION: ', `The chief polity ${polity.name} deliberates`)
   let victim = findWeakestNeighborPolity(polity, all_polities)
-  // console.log('VICTIM', victim)
   if (victim && willGoToWar(polity, victim, all_polities)) {
     goToWar(polity, victim, null, all_polities)
   } else {
     havePeace(polity, all_polities);
   }
   getSubordinates(polity, all_polities).map((subordinate) => {
+    console.log('DECISION: ', `${polity.name}'s subordinate polity ${subordinate.name} deliberates`)
     if (willSecede(polity, subordinate, all_polities)) {
       attemptRebellion(polity, subordinate, all_polities);
     } else {
-      havePeace(polity, all_polities);
+      havePeace(subordinate, all_polities);
     }
   });
 
@@ -192,34 +188,30 @@ const attemptRebellion = (chief, subordinate, all_polities) => {
   const rebellion_succeeds = attackRepelled(probability_to_repel_attack)
   if (rebellion_succeeds) {
     console.log('REBELLION: ', `${subordinate.name} succeeds.`);
-    // chief.resource_level -= costOfUnsuccessfulAttack(probability_of_successful_attack)
-    // subordinate.resource_level -= costOfUnsuccessfulAttack(probability_of_successful_attack)
-    all_polities.forEach(p => {
-      if (p.id === chief.id || p.id === subordinate.id) {
-        p.resource_level -= costOfUnsuccessfulAttack(probability_of_successful_attack)
-      }
-    });
+    decreaseResourceBy(
+      costOfUnsuccessfulAttack(probability_of_successful_attack),
+      [chief.id, subordinate.id],
+      all_polities
+    )
     secede(subordinate, all_polities);
     reorganizeInternalPolities(chief)
   } else {
     console.log('REBELLION: ', `${subordinate.name} fails.`);
-    // chief.resource_level -= costOfSuccessfulAttack(probability_of_successful_attack)
-    // subordinate.resource_level -= costOfSuccessfulAttack(probability_of_successful_attack)
-    all_polities.forEach(p => {
-      if (p.id === chief.id || p.id === subordinate.id) {
-        p.resource_level -= costOfSuccessfulAttack(probability_of_successful_attack)
-      }
-    });
+    decreaseResourceBy(
+      costOfSuccessfulAttack(probability_of_successful_attack),
+      [chief.id, subordinate.id],
+      all_polities
+    )
   }
 }
 
 const havePeace = (polity, all_polities) => {
   console.log('PEACE: ', `${polity.name} has peace.`);
-  all_polities.forEach(p => {
-    if (p.id === polity.id) {
-      p.resource_level += Math.sign(polity.baseline_resource_level - polity.resource_level) * (polity.baseline_resource_level / RESOURCE_RECOVERY_TIME)
-    }
-  });
+  increaseResourceBy(
+    Math.sign(polity.baseline_resource_level - polity.resource_level) * (polity.baseline_resource_level / RESOURCE_RECOVERY_TIME),
+    [polity.id],
+    all_polities
+  )
 }
 
 const goToWar = (attacker, defender, probability_to_repel_attack = null, all_polities) => {
@@ -233,11 +225,11 @@ const goToWar = (attacker, defender, probability_to_repel_attack = null, all_pol
   const attack_succeeds = !attackRepelled(probability_to_repel_attack)
   if (attack_succeeds) {
     console.log('WAR: ', `${attacker.name} succeeds in battle against ${target_community.name}`);
-    all_polities.forEach(p => {
-      if (p.id === attacker.id || p.id === defender.id) { 
-        p.resource_level -= costOfSuccessfulAttack(probability_of_successful_attack)
-      }
-    });
+    decreaseResourceBy(
+      costOfSuccessfulAttack(probability_of_successful_attack), 
+      [attacker.id, defender.id], 
+      all_polities
+    )
     annexTarget(attacker, target_community, all_polities)
     reorganizeInternalPolities(attacker)
     probability_to_repel_attack -= ((1 - LOSER_EFFECT) * probability_to_repel_attack)
@@ -247,11 +239,11 @@ const goToWar = (attacker, defender, probability_to_repel_attack = null, all_pol
     }
   } else {
     console.log('WAR: ', `${attacker.name} fails in battle against ${target_community.name}`);
-    all_polities.forEach(p => {
-      if (p.id === attacker.id || p.id === defender.id) {
-        p.resource_level -= costOfUnsuccessfulAttack(probability_of_successful_attack)
-      }
-    });
+    decreaseResourceBy(
+      costOfUnsuccessfulAttack(probability_of_successful_attack),
+      [attacker.id, defender.id],
+      all_polities
+    )
   }
 }
 
@@ -277,6 +269,22 @@ const costOfSuccessfulAttack = (probability_of_successful_attack) => {
 
 const costOfUnsuccessfulAttack = (probability_of_successful_attack) => {
   return RESOURCE_BASELINE_DEVIATION * probability_of_successful_attack;
+}
+
+const decreaseResourceBy = (value, ids, all_polities) => {
+  all_polities.forEach(p => {
+    if (ids.indexOf(p.id) > -1) {
+      p.resource_level = Math.max(0, p.resource_level - value)
+    }
+  });
+}
+
+const increaseResourceBy = (value, ids, all_polities) => {
+  all_polities.forEach(p => {
+    if (ids.indexOf(p.id) > -1) {
+      p.resource_level += value
+    }
+  });
 }
 
 const getPower = (polity, all_polities) => {
