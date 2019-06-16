@@ -1,5 +1,6 @@
 import { getRandomIntInclusive, getRandomInArray } from "./helper";
 import uuid from 'uuid/v1';
+import { delay } from "q";
 
 /*
 ----------------------
@@ -33,9 +34,9 @@ resulting in peacful annexation of a random set of subordinate polities
 if a polity has been warred against or seceded from, they can not be a target for war until the next year.
 when polities secede, they should acquire a portion of the resources of the chief polity (MAYBE)
 
-find neighbors to attack should target any polities with range of current chief and any of their subordinates
+DONE - find neighbors to attack should target any polities with range of current chief and any of their subordinates
 
-nest goToWar function uses undefined target
+DONE - BUG - nest goToWar function uses undefined target
 
 */
 
@@ -50,14 +51,15 @@ const GRID_SIZE = 100
 // const NEIGHBOR_DISTANCE = GRID_SIZE
 const NEIGHBOR_DISTANCE = GRID_SIZE / 5
 
-export const run = (polities, steps_to_run) => {
+export const run = async (polities, steps_to_run, step_interval = 0) => {
   for (let i = 0; i < steps_to_run; i++) {
     console.log(`%cTIME_STEP: ${i}`, "color: yellow; font-style: italic; background-color: blue;padding: 2px");
     polities
     .filter((polity) => polity.chief === null)
     .map((polity) => makeDecision(polity, polities));
+    await delay(step_interval);
   }
-
+  
   return polities;  
 }
 
@@ -335,8 +337,8 @@ export function createPolity() {
     resource_level: baseline_resource_level,
     chief: null,
     coordinates: {
-      x: getRandomIntInclusive(- GRID_SIZE, GRID_SIZE),
-      y: getRandomIntInclusive(- GRID_SIZE, GRID_SIZE)
+      x: getRandomIntInclusive(0, GRID_SIZE),
+      y: getRandomIntInclusive(0, GRID_SIZE)
     },
   }
   return polity;
