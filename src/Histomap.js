@@ -22,10 +22,10 @@ class Histomap extends React.Component {
     // polities = await Cycling.run(polities, 300, 0);
     // this.setState({polities});
     // console.table(this.state.polities);
-    // for (let i = 0; i < 100; i ++) {
-    //   let polities = await Cycling.run([...this.state.polities], 1, 1000);
-    //   this.setState({ polities });
-    // }
+    for (let i = 0; i < 100; i ++) {
+      let polities = await Cycling.run([...this.state.polities], 1, 1000);
+      this.setState({ polities });
+    }
   }
 
   async step () {
@@ -44,13 +44,13 @@ class Histomap extends React.Component {
         return (
           <Line
             key={i}
-            x={size / 2}
-            y={size / 2}
+            x={0}
+            y={0}
             points={[
               chief_pos_x, 
               chief_pos_y, 
-              chief_pos_x + 20, 
-              chief_pos_y + 20, 
+              // chief_pos_x + 20, 
+              // chief_pos_y + 20, 
               subordinate.coordinates.x * this.state.offset_x, 
               subordinate.coordinates.y * this.state.offset_y
             ]}
