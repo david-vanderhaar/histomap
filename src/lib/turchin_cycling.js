@@ -40,16 +40,16 @@ DONE - BUG - nest goToWar function uses undefined target
 
 */
 
-const TRIBUTE_LEVEL = 0.2 // Math.random();
-const LOSER_EFFECT = 0.1 // Math.random();
+const TRIBUTE_LEVEL = 0.5 // Math.random();
+const LOSER_EFFECT = 0.2 // Math.random();
 const L = 4;
 const RESOURCE_BASELINE_DEVIATION = 0.3 //Math.random();
-const MILITARY_DETERMINISM = 2 //getRandomIntInclusive(1, 2);
+const MILITARY_DETERMINISM = 1 //getRandomIntInclusive(1, 2);
 const WILLINGNESS_TO_ATTACK = 2
-const RESOURCE_RECOVERY_TIME =  5 //getRandomIntInclusive(5, 15);
+const RESOURCE_RECOVERY_TIME =  3 //getRandomIntInclusive(5, 15);
 const GRID_SIZE = 100
-// const NEIGHBOR_DISTANCE = GRID_SIZE
-const NEIGHBOR_DISTANCE = GRID_SIZE / 5
+const NEIGHBOR_DISTANCE = GRID_SIZE
+// const NEIGHBOR_DISTANCE = GRID_SIZE / 5
 
 export const run = async (polities, steps_to_run, step_interval = 0) => {
   for (let i = 0; i < steps_to_run; i++) {
@@ -72,21 +72,23 @@ export const generatePolities = (amount) => {
 }
 
 const makeDecision = (polity, all_polities) => {
-  console.log('DECISION: ', `The chief polity ${polity.name} deliberates`)
-  let victim = findWeakestNeighborPolity(polity, all_polities)
-  if (victim && willGoToWar(polity, victim, all_polities)) {
-    goToWar(polity, victim, null, all_polities)
-  } else {
-    havePeace(polity, all_polities);
-  }
-  getSubordinates(polity, all_polities).map((subordinate) => {
-    console.log('DECISION: ', `${polity.name}'s subordinate polity ${subordinate.name} deliberates`)
-    if (willSecede(polity, subordinate, all_polities)) {
-      attemptRebellion(polity, subordinate, all_polities);
+  if (polity.chief === null) {
+    console.log('DECISION: ', `The chief polity ${polity.name} deliberates`)
+    let victim = findWeakestNeighborPolity(polity, all_polities)
+    if (victim && willGoToWar(polity, victim, all_polities)) {
+      goToWar(polity, victim, null, all_polities)
     } else {
-      havePeace(subordinate, all_polities);
+      havePeace(polity, all_polities);
     }
-  });
+    getSubordinates(polity, all_polities).map((subordinate) => {
+      console.log('DECISION: ', `${polity.name}'s subordinate polity ${subordinate.name} deliberates`)
+      if (willSecede(polity, subordinate, all_polities)) {
+        attemptRebellion(polity, subordinate, all_polities);
+      } else {
+        havePeace(subordinate, all_polities);
+      }
+    });
+  }
 
   return polity;
 }
@@ -174,13 +176,13 @@ const secede = (polity, all_polities) => {
 const willGoToWar = (polity, neighbor, all_polities) => {
   const P = probabilityOfSuccessfulAttack(polity, neighbor, all_polities);
   const c = costOfSuccessfulAttack(P);
-  return Math.random() >= probabilityPolityWillAttack(polity, P, c);
+  return Math.random() <= probabilityPolityWillAttack(polity, P, c);
 }
 
 const willSecede = (chief, subordinate, all_polities) => {
   // console.log(subordinate);
   const probability_to_repel_attack = 1 - probabilityOfSuccessfulAttack(chief, subordinate, all_polities)
-  return Math.random() >= probability_to_repel_attack;
+  return Math.random() <= probability_to_repel_attack;
 }
 
 const attemptRebellion = (chief, subordinate, all_polities) => {
@@ -192,7 +194,10 @@ const attemptRebellion = (chief, subordinate, all_polities) => {
     console.log('REBELLION: ', `${subordinate.name} succeeds.`);
     decreaseResourceBy(
       costOfUnsuccessfulAttack(probability_of_successful_attack),
-      [chief.id, subordinate.id],
+      [
+        chief.id, 
+        subordinate.id
+      ],
       all_polities
     )
     secede(subordinate, all_polities);
@@ -201,7 +206,10 @@ const attemptRebellion = (chief, subordinate, all_polities) => {
     console.log('REBELLION: ', `${subordinate.name} fails.`);
     decreaseResourceBy(
       costOfSuccessfulAttack(probability_of_successful_attack),
-      [chief.id, subordinate.id],
+      [
+        chief.id, 
+        subordinate.id
+      ],
       all_polities
     )
   }
@@ -220,7 +228,7 @@ const goToWar = (attacker, defender, probability_to_repel_attack = null, all_pol
   let target_community = findWealthiestBorderCommunity(attacker, defender, all_polities);
   console.log('WAR: ', `${attacker.name} prepares for war against ${defender.name}`);
   
-  let probability_of_successful_attack = probabilityOfSuccessfulAttack(attacker, defender, all_polities)
+  let probability_of_successful_attack = probabilityOfSuccessfulAttack(attacker, target_community, all_polities)
   if(probability_to_repel_attack === null) {
     probability_to_repel_attack = 1 - probability_of_successful_attack
   }
@@ -229,13 +237,17 @@ const goToWar = (attacker, defender, probability_to_repel_attack = null, all_pol
     console.log('WAR: ', `${attacker.name} succeeds in battle against ${target_community.name}`);
     decreaseResourceBy(
       costOfSuccessfulAttack(probability_of_successful_attack), 
-      [attacker.id, defender.id], 
+      [
+        attacker.id,
+        // defender.id,
+        target_community.id,
+      ], 
       all_polities
     )
     annexTarget(attacker, target_community, all_polities)
     reorganizeInternalPolities(attacker)
     probability_to_repel_attack -= ((1 - LOSER_EFFECT) * probability_to_repel_attack)
-    if (getSubordinates(defender, all_polities).length > 0) {
+    if (defender.chief !== attacker.id) {
       console.log('WAR: ', `${attacker.name}'s onslaught continues against ${defender.name}`);
       goToWar(attacker, defender, probability_to_repel_attack, all_polities)
     }
@@ -243,14 +255,18 @@ const goToWar = (attacker, defender, probability_to_repel_attack = null, all_pol
     console.log('WAR: ', `${attacker.name} fails in battle against ${target_community.name}`);
     decreaseResourceBy(
       costOfUnsuccessfulAttack(probability_of_successful_attack),
-      [attacker.id, defender.id],
+      [
+        attacker.id, 
+        // defender.id,
+        target_community.id,
+      ],
       all_polities
     )
   }
 }
 
 const attackRepelled = (probability_to_repel_attack) => {
-  return Math.random() >= probability_to_repel_attack
+  return Math.random() <= probability_to_repel_attack
 }
 
 const probabilityOfSuccessfulAttack = (polity, neighbor, all_polities) => {
@@ -289,7 +305,7 @@ const increaseResourceBy = (value, ids, all_polities) => {
   });
 }
 
-const getPower = (polity, all_polities) => {
+export const getPower = (polity, all_polities) => {
   const subordinates = getSubordinates(polity, all_polities)
   let res = subordinates.reduce(
       (acc, curr) => {
@@ -300,7 +316,7 @@ const getPower = (polity, all_polities) => {
   return res + polity.resource_level
 }
 
-const getSubordinates = (polity, all_polities) => {
+export const getSubordinates = (polity, all_polities) => {
   return all_polities.filter((p) => (p.id !== polity.id) && (getChiefPolity(p, all_polities).id === polity.id));
 }
 
