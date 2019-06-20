@@ -21,11 +21,11 @@ class Histomap extends React.Component {
     console.table(this.state.polities);
     // polities = await Cycling.run(polities, 300, 0);
     // this.setState({polities});
-    // console.table(this.state.polities);
-    for (let i = 0; i < 100; i ++) {
-      let polities = await Cycling.run([...this.state.polities], 1, 1000);
-      this.setState({ polities });
-    }
+    // // console.table(this.state.polities);
+    // for (let i = 0; i < 100; i ++) {
+    //   let polities = await Cycling.run([...this.state.polities], 1, 1000);
+    //   this.setState({ polities });
+    // }
   }
 
   async step () {
@@ -40,7 +40,7 @@ class Histomap extends React.Component {
       const chief_pos_y = p.coordinates.y * this.state.offset_y
       const power = Cycling.getPower(p, this.state.polities)
       const size = (this.state.size_multiplier * power) + this.state.base_size
-      const subordinate_lines = Cycling.getSubordinates(p, this.state.polities).map((subordinate, i) => {
+      const subordinate_lines = Cycling.getImmediateSubordinates(p, this.state.polities).map((subordinate, i) => {
         return (
           <Line
             key={i}
@@ -54,7 +54,8 @@ class Histomap extends React.Component {
               subordinate.coordinates.x * this.state.offset_x, 
               subordinate.coordinates.y * this.state.offset_y
             ]}
-            stroke={'red'}
+            stroke={Cycling.getChiefPolity(p, this.state.polities).color}
+            // stroke={p.color}
             tension={1}
           />
         )
@@ -80,7 +81,7 @@ class Histomap extends React.Component {
             y={chief_pos_y}
             width={size}
             height={size}
-            fill={Konva.Util.getRandomColor()}
+            fill={p.color}
             shadowBlur={5}
           />
           {subordinate_lines}

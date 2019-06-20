@@ -1,6 +1,7 @@
 import { getRandomIntInclusive, getRandomInArray } from "./helper";
 import uuid from 'uuid/v1';
 import { delay } from "q";
+import Konva from 'konva';
 
 /*
 ----------------------
@@ -12,7 +13,7 @@ MILITARY_DETERMINISM = Scaling exponent (of the polity power to the probability 
 RESOURCE_BASELINE_DEVIATION = Standard deviation of the baseline resource level
 TRIBUTE_LEVEL = Tribute level
 WILLINGNESS_TO_ATTACK = a variable > 0
-L = Span of control (the maximum number of subordinate polities)
+MAX_CONTROL = Span of control (the maximum number of subordinate polities)
 τ = The expected time in power of the paramount chief
 max_s = Relative size of the largest polity
 c = Mean complexity
@@ -32,7 +33,10 @@ There is a chance t every time_step that the paramount chief dies,
 resulting in peacful annexation of a random set of subordinate polities
 
 if a polity has been warred against or seceded from, they can not be a target for war until the next year.
+
 when polities secede, they should acquire a portion of the resources of the chief polity (MAYBE)
+
+DONE - when polity id captured, if it has subordinates, they should become independant
 
 DONE - find neighbors to attack should target any polities with range of current chief and any of their subordinates
 
@@ -42,20 +46,20 @@ DONE - BUG - nest goToWar function uses undefined target
 
 const TRIBUTE_LEVEL = 0.5 // Math.random();
 const LOSER_EFFECT = 0.2 // Math.random();
-const L = 4;
-const RESOURCE_BASELINE_DEVIATION = 0.3 //Math.random();
-const MILITARY_DETERMINISM = 1 //getRandomIntInclusive(1, 2);
+const MAX_CONTROL = 4;
+const RESOURCE_BASELINE_DEVIATION = 0.2 //Math.random();
+const MILITARY_DETERMINISM = 4 //getRandomIntInclusive(1, 2);
 const WILLINGNESS_TO_ATTACK = 2
 const RESOURCE_RECOVERY_TIME =  3 //getRandomIntInclusive(5, 15);
 const GRID_SIZE = 100
 const NEIGHBOR_DISTANCE = GRID_SIZE
-// const NEIGHBOR_DISTANCE = GRID_SIZE / 5
+// const NEIGHBOR_DISTANCE = GRID_SIZE / 3
 
 export const run = async (polities, steps_to_run, step_interval = 0) => {
   for (let i = 0; i < steps_to_run; i++) {
     console.log(`%cTIME_STEP: ${i}`, "color: yellow; font-style: italic; background-color: blue;padding: 2px");
     polities
-    .filter((polity) => polity.chief === null)
+    // .filter((polity) => polity.chief === null)
     .map((polity) => makeDecision(polity, polities));
     await delay(step_interval);
   }
@@ -72,6 +76,8 @@ export const generatePolities = (amount) => {
 }
 
 const makeDecision = (polity, all_polities) => {
+  upkeep(polity, all_polities);
+  // consider allowing all polities that have subs, make this decision
   if (polity.chief === null) {
     console.log('DECISION: ', `The chief polity ${polity.name} deliberates`)
     let victim = findWeakestNeighborPolity(polity, all_polities)
@@ -80,29 +86,32 @@ const makeDecision = (polity, all_polities) => {
     } else {
       havePeace(polity, all_polities);
     }
-    getSubordinates(polity, all_polities).map((subordinate) => {
-      console.log('DECISION: ', `${polity.name}'s subordinate polity ${subordinate.name} deliberates`)
-      if (willSecede(polity, subordinate, all_polities)) {
-        attemptRebellion(polity, subordinate, all_polities);
-      } else {
-        havePeace(subordinate, all_polities);
-      }
-    });
+  } else {
+    // rebelling polities rebel against immediate chief
+    // const chief_polity = getImmediateChief(polity, all_polities);
+
+    // rebelling polities rebel against paramount chief
+    const chief_polity = getChiefPolity(polity, all_polities);
+    console.log('DECISION: ', `${chief_polity.name}'s subordinate polity ${polity.name} deliberates`)
+    if (willSecede(chief_polity, polity, all_polities)) {
+      attemptRebellion(chief_polity, polity, all_polities);
+    } else {
+      havePeace(polity, all_polities);
+    }
   }
 
   return polity;
 }
 
 const findWeakestNeighborPolity = (polity, all_polities) => {
-  let comms = getNeighborCommunities(polity, all_polities)
-  // console.log(comms);
+  let neighbor_communities = getNeighborCommunities(polity, all_polities)
+    .filter((c) => !c.has_incurred_secession)
   
   const neighbor_chiefs = 
-    comms
+    neighbor_communities
     .map((p) => getChiefPolity(p, all_polities))
     .sort((a, b) => getPower(a, all_polities) - getPower(b, all_polities))
   
-  // console.log(neighbor_chiefs);
   return neighbor_chiefs.length > 0 ? neighbor_chiefs[0] : false;
 }
 
@@ -115,18 +124,23 @@ const isInRange = (a, b) => {
   )
 }
 
-const getNeighborCommunities = (polity, all_polities) => {
-  let polity_or_subordinate_is_in_range = [
-    polity, 
-    ...getSubordinates(polity, all_polities)
-  ].reduce((acc, curr) => acc + isInRange(polity, curr), 
-    0
+let isInRangeOfChiefOrSubordinates = (chief, victim, all_polities) => {
+  return (
+    [
+      chief,
+      ...getAllSubordinates(chief, all_polities)
+    ].reduce((acc, curr) => acc + isInRange(victim, curr),
+      0
+    )
   )
+}
+
+const getNeighborCommunities = (polity, all_polities) => {
   return all_polities.filter((p) => {
     return (
-      polity_or_subordinate_is_in_range
-      && p.chief !== polity.id
+      getChiefPolity(p, all_polities).id !== polity.id
       && p.id !== polity.id
+      && isInRangeOfChiefOrSubordinates(polity, p, all_polities)
     );
   });
 }
@@ -135,10 +149,10 @@ const findWealthiestBorderCommunity = (attacker, defender, all_polities) => {
   // need to account for adjacency
   let neighbor_communities = []
 
-  if (getSubordinates(defender, all_polities).length > 0) {
+  if (getAllSubordinates(defender, all_polities).length > 0) {
     neighbor_communities =
       getNeighborCommunities(attacker, all_polities)
-      .filter((p) => p.chief === defender.id)
+      .filter((p) => getChiefPolity(p, all_polities).id === defender.id)
       .sort((a, b) => getPower(b, all_polities) - getPower(a, all_polities))
   } else {
     // neighbor_communities = [defender]
@@ -150,25 +164,59 @@ const findWealthiestBorderCommunity = (attacker, defender, all_polities) => {
   return neighbor_communities.length > 0 ? neighbor_communities[0] : false;
 }
 
-const reorganizeInternalPolities = (polity) => {
-  // TODO
-  return polity;
+const reorganizeInternalPolities = (chief, all_polities) => {
+  // TODO - Needs recursion
+  let annex_pairs = [];
+  const subordinates = getAllSubordinates(chief, all_polities)
+    .sort((a, b) => getPower(b, all_polities) - getPower(a, all_polities))
+  if (subordinates.length > MAX_CONTROL) {
+    subordinates.map((s, i) => {
+      if (i >= MAX_CONTROL) {
+        annex_pairs.push({ chief: subordinates[i - MAX_CONTROL], target: s})
+      }
+    })
+  }
+  annex_pairs.map((pair) => {
+    all_polities.forEach(p => {
+      if (p.id === pair.target.id) {
+        p.chief = pair.chief.id
+      }
+    })
+  })
 }
 
 const annexTarget = (chief, target, all_polities) => {
   console.log('ANNEX: ', `${target.name} is annexed by ${chief.name}.`);
-  
+  const target_subordinate_ids = getImmediateSubordinates(target, all_polities).map((t) => t.id);
   all_polities.forEach(p => {
     if (p.id === target.id) {
       p.chief = chief.id
+    }
+    // immediate subordinates of target polity should become free
+    if (target_subordinate_ids.indexOf(p.id) > -1) {
+      p.chief = null
     }
   });
 }
 
 const secede = (polity, all_polities) => {
+  const chief = getChiefPolity(polity, all_polities);
+  all_polities.forEach(p => {
+    if (p.id === chief.id) {
+      p.has_incurred_secession = true;
+    }
+  });
   all_polities.forEach(p => {
     if (p.id === polity.id) {
       p.chief = null;
+    }
+  });
+}
+
+const upkeep = (polity, all_polities) => {
+  all_polities.forEach(p => {
+    if (p.id === polity.id) {
+      p.has_incurred_secession = false;
     }
   });
 }
@@ -201,7 +249,8 @@ const attemptRebellion = (chief, subordinate, all_polities) => {
       all_polities
     )
     secede(subordinate, all_polities);
-    reorganizeInternalPolities(chief)
+    // reorganizeInternalPolities(chief, all_polities)
+    reorganizeInternalPolities(getChiefPolity(chief), all_polities)
   } else {
     console.log('REBELLION: ', `${subordinate.name} fails.`);
     decreaseResourceBy(
@@ -245,9 +294,10 @@ const goToWar = (attacker, defender, probability_to_repel_attack = null, all_pol
       all_polities
     )
     annexTarget(attacker, target_community, all_polities)
-    reorganizeInternalPolities(attacker)
+    reorganizeInternalPolities(attacker, all_polities)
     probability_to_repel_attack -= ((1 - LOSER_EFFECT) * probability_to_repel_attack)
-    if (defender.chief !== attacker.id) {
+    // if (defender.chief !== attacker.id) {
+    if (getChiefPolity(defender, all_polities).id !== attacker.id) {
       console.log('WAR: ', `${attacker.name}'s onslaught continues against ${defender.name}`);
       goToWar(attacker, defender, probability_to_repel_attack, all_polities)
     }
@@ -306,7 +356,7 @@ const increaseResourceBy = (value, ids, all_polities) => {
 }
 
 export const getPower = (polity, all_polities) => {
-  const subordinates = getSubordinates(polity, all_polities)
+  const subordinates = getImmediateSubordinates(polity, all_polities)
   let res = subordinates.reduce(
       (acc, curr) => {
         return acc + (curr.resource_level * TRIBUTE_LEVEL)
@@ -316,11 +366,15 @@ export const getPower = (polity, all_polities) => {
   return res + polity.resource_level
 }
 
-export const getSubordinates = (polity, all_polities) => {
+export const getAllSubordinates = (polity, all_polities) => {
   return all_polities.filter((p) => (p.id !== polity.id) && (getChiefPolity(p, all_polities).id === polity.id));
 }
 
-const getChiefPolity = (polity, all_polities) => {
+export const getImmediateSubordinates = (polity, all_polities) => {
+  return all_polities.filter((p) => (p.id !== polity.id) && (p.chief === polity.id));
+}
+
+export const getChiefPolity = (polity, all_polities) => {
   let chief_polity = false;
   let result = [];
   
@@ -343,6 +397,11 @@ const getChiefPolity = (polity, all_polities) => {
 
 }
 
+const getImmediateChief = (polity, all_polities) => {
+  const result = all_polities.filter((p) => polity.chief === p.id);
+  return result.length > 0 ? result[0] : false;
+}
+
 export function createPolity() {
   const baseline_resource_level = 1 + (getRandomIntInclusive(-1, 1) * RESOURCE_BASELINE_DEVIATION)
 
@@ -356,6 +415,8 @@ export function createPolity() {
       x: getRandomIntInclusive(0, GRID_SIZE),
       y: getRandomIntInclusive(0, GRID_SIZE)
     },
+    has_incurred_secession: false,
+    color: Konva.Util.getRandomColor(),
   }
   return polity;
 }
