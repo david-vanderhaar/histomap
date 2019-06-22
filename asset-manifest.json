@@ -1,0 +1,16 @@
+{
+  "files": {
+    "main.css": "/histomap/static/css/main.a40dd6d1.chunk.css",
+    "main.js": "/histomap/static/js/main.a6894f7f.chunk.js",
+    "main.js.map": "/histomap/static/js/main.a6894f7f.chunk.js.map",
+    "runtime~main.js": "/histomap/static/js/runtime~main.b9ef3423.js",
+    "runtime~main.js.map": "/histomap/static/js/runtime~main.b9ef3423.js.map",
+    "static/js/2.483e229b.chunk.js": "/histomap/static/js/2.483e229b.chunk.js",
+    "static/js/2.483e229b.chunk.js.map": "/histomap/static/js/2.483e229b.chunk.js.map",
+    "index.html": "/histomap/index.html",
+    "precache-manifest.cac77c4c87c7264299c6cdf2d15defe6.js": "/histomap/precache-manifest.cac77c4c87c7264299c6cdf2d15defe6.js",
+    "service-worker.js": "/histomap/service-worker.js",
+    "static/css/main.a40dd6d1.chunk.css.map": "/histomap/static/css/main.a40dd6d1.chunk.css.map",
+    "static/media/logo.svg": "/histomap/static/media/logo.43f13564.svg"
+  }
+}
