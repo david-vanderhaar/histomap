@@ -31,7 +31,7 @@ class Histomap extends React.Component {
   async step () {
     let polities = await Cycling.run([...this.state.polities], 1, 0);
     this.setState({ polities });
-    console.table(polities);
+    // console.table(polities);
   }
 
   render() {
@@ -42,22 +42,25 @@ class Histomap extends React.Component {
       const size = (this.state.size_multiplier * power) + this.state.base_size
       const subordinate_lines = Cycling.getImmediateSubordinates(p, this.state.polities).map((subordinate, i) => {
         return (
-          <Line
-            key={i}
-            x={0}
-            y={0}
-            points={[
-              chief_pos_x, 
-              chief_pos_y, 
-              // chief_pos_x + 20, 
-              // chief_pos_y + 20, 
-              subordinate.coordinates.x * this.state.offset_x, 
-              subordinate.coordinates.y * this.state.offset_y
-            ]}
-            stroke={Cycling.getChiefPolity(p, this.state.polities).color}
-            // stroke={p.color}
-            tension={1}
-          />
+          <Group>
+            <Line
+              key={i + 'b'}
+              x={0}
+              y={0}
+              points={[
+                chief_pos_x, 
+                chief_pos_y, 
+                // chief_pos_x + 20, 
+                // chief_pos_y + 20, 
+                subordinate.coordinates.x * this.state.offset_x, 
+                subordinate.coordinates.y * this.state.offset_y
+              ]}
+              stroke={Cycling.getChiefPolity(p, this.state.polities).color}
+              // stroke={p.color}
+              tension={1}
+              strokeWidth={4}
+            />
+          </Group>
         )
       })
       return (
