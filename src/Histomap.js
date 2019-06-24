@@ -1,19 +1,22 @@
 import React from 'react';
 import './App.css';
-import * as StateGenerator from './lib/generators/state';
-import * as Events from './lib/events';
 import * as Cycling from './lib/turchin_cycling';
+import NodeView from './histomap/NodeView';
+import ChartView from './histomap/ChartView';
 import { Stage, Layer, Rect, Text, Line, Group } from 'react-konva';
-import Konva from 'konva';
 
 class Histomap extends React.Component {
+  constructor() {
+    super();
+    const polities = Cycling.generatePolities(10);
+    const total_power = Cycling.getTotalPower(polities, polities)
 
-  state = {
-    polities: Cycling.generatePolities(10),
-    offset_x: (window.innerWidth / 100) - 1,
-    offset_y: (window.innerHeight / 100) - 1,
-    base_size: 10,
-    size_multiplier: 20,
+    this.state = {
+      polities: polities,
+      width: window.innerWidth - 40,
+      height: window.innerHeight,
+      history: [{polities, total_power}],
+    }
   }
 
   async componentDidMount () {
@@ -30,69 +33,16 @@ class Histomap extends React.Component {
 
   async step () {
     let polities = await Cycling.run([...this.state.polities], 1, 0);
-    this.setState({ polities });
+    const total_power = Cycling.getTotalPower(polities, polities)
+    const history = this.state.history.concat({polities, total_power});
+    
+    this.setState({ polities, history });
     // console.table(polities);
   }
 
   render() {
-    const polities = this.state.polities.map((p, i) => {
-      const chief_pos_x = p.coordinates.x * this.state.offset_x
-      const chief_pos_y = p.coordinates.y * this.state.offset_y
-      const power = Cycling.getPower(p, this.state.polities)
-      const size = (this.state.size_multiplier * power) + this.state.base_size
-      const subordinate_lines = Cycling.getImmediateSubordinates(p, this.state.polities).map((subordinate, i) => {
-        return (
-          <Group>
-            <Line
-              key={i + 'b'}
-              x={0}
-              y={0}
-              points={[
-                chief_pos_x, 
-                chief_pos_y, 
-                // chief_pos_x + 20, 
-                // chief_pos_y + 20, 
-                subordinate.coordinates.x * this.state.offset_x, 
-                subordinate.coordinates.y * this.state.offset_y
-              ]}
-              stroke={Cycling.getChiefPolity(p, this.state.polities).color}
-              // stroke={p.color}
-              tension={1}
-              strokeWidth={4}
-            />
-          </Group>
-        )
-      })
-      return (
-        <Group key={i}>
-          <Text
-            x={chief_pos_x}
-            y={chief_pos_y + 40}
-            text={p.name}
-            fill='red'
-            fontSize={20}
-          />
-          <Text
-            x={chief_pos_x}
-            y={chief_pos_y - 20}
-            text={Math.round(power * 100) / 100}
-            fill='red'
-            fontSize={20}
-          />
-          <Rect
-            x={chief_pos_x}
-            y={chief_pos_y}
-            width={size}
-            height={size}
-            fill={p.color}
-            shadowBlur={5}
-          />
-          {subordinate_lines}
-        </Group>
-      )
-    })
     return (
-      <Stage width={window.innerWidth} height={window.innerHeight}>
+      <Stage width={this.state.width} height={this.state.width}>
         <Layer>
           <Rect
             x={20}
@@ -109,10 +59,22 @@ class Histomap extends React.Component {
             fill='black'
             fontSize={20}
           />
-          {polities}
+        </Layer>
+        <Layer>
+          {/* <NodeView 
+            polities={this.state.polities} 
+            width={this.state.width} 
+            height={this.state.height}
+          /> */}
+          <ChartView 
+            polities={this.state.polities} 
+            history={this.state.history} 
+            width={this.state.width} 
+            height={this.state.height}
+          />
         </Layer>
       </Stage>
-    );
+    )
   }
 }
 

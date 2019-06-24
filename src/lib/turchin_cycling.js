@@ -29,6 +29,13 @@ time_step = current step in time
 ----------------------
       TODO's
 ----------------------
+Create visual log of polity actions
+
+Create area interpretation which breaks the screen into chunks and 
+color codes swathes of land via the chief polity (shapes)
+
+Create Histomap graph (printable, scrollable) which includes power shifts and significant events
+
 DONE - There is a chance t every time_step that the paramount chief dies, 
 resulting in peacful annexation of a random set of subordinate polities
 
@@ -403,6 +410,13 @@ export const getPower = (polity, all_polities) => {
       0
     )
   return res + polity.resource_level
+}
+
+export const getTotalPower = (polities, all_polities) => {
+  return polities.reduce(
+    (acc, curr) => {
+      return acc + getPower(curr, all_polities)
+    }, 0)
 }
 
 export const getAllSubordinates = (polity, all_polities) => {
