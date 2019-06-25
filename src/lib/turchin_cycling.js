@@ -406,9 +406,7 @@ export const getPower = (polity, all_polities) => {
   let res = subordinates.reduce(
       (acc, curr) => {
         return acc + (curr.resource_level * TRIBUTE_LEVEL)
-      },
-      0
-    )
+      }, 0)
   return res + polity.resource_level
 }
 

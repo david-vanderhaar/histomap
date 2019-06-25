@@ -10,12 +10,16 @@ class Histomap extends React.Component {
     super();
     const polities = Cycling.generatePolities(10);
     const total_power = Cycling.getTotalPower(polities, polities)
+    let percents = polities.map((p) => {
+      let percent = (Cycling.getPower(p, polities) / total_power)
+      return { percent, polity_id: p.id }
+    })
 
     this.state = {
       polities: polities,
       width: window.innerWidth - 40,
       height: window.innerHeight,
-      history: [{polities, total_power}],
+      history: [{polities, percents}],
     }
   }
 
@@ -26,15 +30,19 @@ class Histomap extends React.Component {
     // this.setState({polities});
     // // console.table(this.state.polities);
     // for (let i = 0; i < 100; i ++) {
-    //   let polities = await Cycling.run([...this.state.polities], 1, 1000);
-    //   this.setState({ polities });
+    //   await this.step(1000);
     // }
   }
 
-  async step () {
-    let polities = await Cycling.run([...this.state.polities], 1, 0);
+  async step (step_interval = 0) {
+    let polities = await Cycling.run([...this.state.polities], 1, step_interval);
     const total_power = Cycling.getTotalPower(polities, polities)
-    const history = this.state.history.concat({polities, total_power});
+    let percents = polities.map((p) => {
+      let percent = (Cycling.getPower(p, polities) / total_power)
+      return {percent, polity_id: p.id}
+    })
+
+    const history = this.state.history.concat({polities, percents});
     
     this.setState({ polities, history });
     // console.table(polities);
