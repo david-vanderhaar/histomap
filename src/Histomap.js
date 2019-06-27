@@ -4,19 +4,18 @@ import * as Cycling from './lib/turchin_cycling';
 import NodeView from './histomap/NodeView';
 import ChartView from './histomap/ChartView';
 import { Stage, Layer, Rect, Text, Line, Group } from 'react-konva';
+import { getRandomIntInclusive } from './lib/helper';
 
 class Histomap extends React.Component {
   constructor() {
     super();
-    const polities = Cycling.generatePolities(10);
-    const total_power = Cycling.getTotalPower(polities, polities)
-    let percents = polities.map((p) => {
-      let percent = (Cycling.getPower(p, polities) / total_power)
-      return { percent, polity_id: p.id }
-    })
+    const polities = Cycling.generatePolities(30);
+    // const percents = Cycling.getPowerPercentages(polities);
+    const percents = Cycling.getPolityPercentages(polities);
 
     this.state = {
       polities: polities,
+      all_historical_polities: polities,
       width: window.innerWidth - 40,
       height: window.innerHeight,
       history: [{polities, percents}],
@@ -29,18 +28,19 @@ class Histomap extends React.Component {
     // polities = await Cycling.run(polities, 300, 0);
     // this.setState({polities});
     // // console.table(this.state.polities);
-    // for (let i = 0; i < 100; i ++) {
-    //   await this.step(1000);
-    // }
+    for (let i = 0; i < 200; i ++) {
+      await this.step(500);
+    }
   }
 
   async step (step_interval = 0) {
     let polities = await Cycling.run([...this.state.polities], 1, step_interval);
-    const total_power = Cycling.getTotalPower(polities, polities)
-    let percents = polities.map((p) => {
-      let percent = (Cycling.getPower(p, polities) / total_power)
-      return {percent, polity_id: p.id}
-    })
+    // testing out when a polity is removed
+    // let random_index = getRandomIntInclusive(0, polities.length);
+    // polities = polities.filter((p, i) => i !== random_index)
+
+    // const percents = Cycling.getPowerPercentages(polities);
+    const percents = Cycling.getPolityPercentages(polities);
 
     const history = this.state.history.concat({polities, percents});
     
@@ -76,6 +76,7 @@ class Histomap extends React.Component {
           /> */}
           <ChartView 
             polities={this.state.polities} 
+            all_historical_polities={this.state.all_historical_polities} 
             history={this.state.history} 
             width={this.state.width} 
             height={this.state.height}

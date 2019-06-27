@@ -5,8 +5,8 @@ import { Stage, Layer, Circle, Text, Line, Group } from 'react-konva';
 
 class ChartView extends React.Component {
   state = {
-    step_distance: 30,
-    // step_distance: 100,
+    // step_distance: 30,
+    step_distance: 100,
     entity_distance: 40,
     offset_x: 160,
     offset_y: 25,
@@ -15,7 +15,7 @@ class ChartView extends React.Component {
   }
 
   render() {
-    let lines = this.props.polities.map((p) => {
+    let lines = this.props.all_historical_polities.map((p) => {
       return {
         polity: p,
         points: [],
@@ -64,7 +64,23 @@ class ChartView extends React.Component {
             )
           })
         }
-        <Group x={this.state.offset_x} y={this.state.offset_y}>
+        <Group 
+          x={this.state.offset_x} 
+          // y={this.state.offset_y}
+          y={this.state.offset_y - (this.props.history.length * 100 >= (this.props.height - this.state.offset_y) ? this.props.history.length * 100 : 0) + this.props.height - 100}
+          draggable={true}
+          dragBoundFunc={
+            (pos) => {
+              // console.log(pos.y);
+              
+              return {
+                x: this.state.offset_x,
+                y: Math.min(this.state.offset_y, pos.y)
+              }
+            }
+          }
+
+        >
           {
             lines.map((line, k) => {
               let extra_points = [];
@@ -82,6 +98,7 @@ class ChartView extends React.Component {
                   points={line.points.concat(extra_points)}
                   stroke={line.polity.color}
                   tension={0}
+                  // bezier={true}
                   strokeWidth={4}
                   closed={true}
                   fill={line.polity.color}
@@ -106,6 +123,24 @@ class ChartView extends React.Component {
                 />
               )
             })
+          }
+          {
+            // this.props.history.map((step, i) => {
+              
+            //   return step.polities.map((polity, j) => {
+            //     console.log(polity.events);
+            //     return (
+            //       <Text
+            //         x={j * (this.props.width - this.state.offset_x) / 10}
+            //         // y={((i * this.state.step_distance))}
+            //         y={((i * this.state.step_distance) + (j * 20))}
+            //         text={polity.events.length > 0 ? polity.events[polity.events.length - 1].message : 'none'}
+            //         fill={'white'}
+            //         fontSize={10}
+            //       />
+            //     )
+            //   })
+            // })
           }
         </Group>
       </Group>

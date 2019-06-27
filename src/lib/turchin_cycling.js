@@ -53,15 +53,15 @@ DONE - BUG - nest goToWar function uses undefined target
 
 const TRIBUTE_LEVEL = 0.5 // Math.random();
 const LOSER_EFFECT = 0.2 // Math.random();
-const CHIEF_LIFE_EXPECTANCY = 100;
+const CHIEF_LIFE_EXPECTANCY = 1000;
 const MAX_CONTROL = 4;
 const RESOURCE_BASELINE_DEVIATION = 0.2 //Math.random();
 const MILITARY_DETERMINISM = 2 //getRandomIntInclusive(1, 2);
 const WILLINGNESS_TO_ATTACK = 2
 const RESOURCE_RECOVERY_TIME =  3 //getRandomIntInclusive(5, 15);
 const GRID_SIZE = 100
-// const NEIGHBOR_DISTANCE = GRID_SIZE
-const NEIGHBOR_DISTANCE = GRID_SIZE / 3
+const NEIGHBOR_DISTANCE = GRID_SIZE
+// const NEIGHBOR_DISTANCE = GRID_SIZE / 3
 
 export const run = async (polities, steps_to_run, step_interval = 0) => {
   for (let i = 0; i < steps_to_run; i++) {
@@ -83,9 +83,12 @@ export const generatePolities = (amount) => {
   return polities;
 }
 
-const hasChiefDied = (polity) => {
+const hasChiefDied = (polity, all_polities) => {
   const has_died = Math.random() <= (polity.chief_age / CHIEF_LIFE_EXPECTANCY) - 0.3
-  has_died && console.log(`DEATH: ${polity.name}'s Chief has died`)
+  if (has_died) {
+    console.log(`DEATH: ${polity.name}'s Chief has died`)
+    addEvent('DEATH', `${polity.name}'s Chief has died.`, [polity.id], all_polities)
+  }
   return has_died;
 }
 
@@ -119,6 +122,7 @@ const makeDecision = (polity, all_polities) => {
     // consider allowing all polities that have subs, make this decision
     if (polity.chief === null) {
       console.log('DECISION: ', `The chief polity ${polity.name} deliberates`)
+      addEvent('DECISION', `The chief polity ${polity.name} deliberates`, [polity.id], all_polities)
       let victim = findWeakestNeighborPolity(polity, all_polities)
       if (victim && willGoToWar(polity, victim, all_polities)) {
         goToWar(polity, victim, null, all_polities)
@@ -453,6 +457,62 @@ const getImmediateChief = (polity, all_polities) => {
   return result.length > 0 ? result[0] : false;
 }
 
+const createEvent = (type = 'DEFAULT', message = '') => {
+  const event = EVENT_TYPES[type]; 
+  return { event, message }
+}
+
+const addEvent = (type, message, ids, all_polities) => {
+  all_polities.forEach(p => {
+    if (ids.indexOf(p.id) > -1) {
+      p.events = p.events.concat(createEvent(type, message))
+    }
+  });
+}
+
+export const EVENT_TYPES = {
+  DEFAULT: {
+    color: 'gray',
+  },
+  DECISION: {
+    color: 'green',
+  },
+  WAR: {
+    color: 'red',
+  },
+  PEACE: {
+    color: 'blue',
+  },
+  SECESSION: {
+    color: 'yellow',
+  },
+  ANNEXATION: {
+    color: 'orange',
+  },
+  DEATH: {
+    color: 'purple',
+  },
+  DISMANTLE: {
+    color: 'gray',
+  },
+}
+
+export const getPolityPercentages = (polities) => {
+  const total_communities = polities.length;
+  return polities.map((p) => {
+    let percent = (getAllSubordinates(p, polities).length) / total_communities
+    return { percent, polity_id: p.id }
+  })
+}
+
+export const getPowerPercentages = (polities) => {
+  const total_power = getTotalPower(polities, polities)
+  return polities.map((p) => {
+    let percent = (getPower(p, polities) / total_power)
+    return { percent, polity_id: p.id }
+  })
+}
+
 export function createPolity() {
   const baseline_resource_level = 1 + (getRandomIntInclusive(-1, 1) * RESOURCE_BASELINE_DEVIATION)
 
@@ -469,6 +529,7 @@ export function createPolity() {
     has_incurred_secession: false,
     has_incurred_war: false,
     chief_age: 30,
+    events: [],
     color: Konva.Util.getRandomColor(),
   }
   return polity;
