@@ -1,14 +1,14 @@
 {
   "files": {
     "main.css": "/histomap/static/css/main.a40dd6d1.chunk.css",
-    "main.js": "/histomap/static/js/main.a6894f7f.chunk.js",
-    "main.js.map": "/histomap/static/js/main.a6894f7f.chunk.js.map",
+    "main.js": "/histomap/static/js/main.87f0f498.chunk.js",
+    "main.js.map": "/histomap/static/js/main.87f0f498.chunk.js.map",
     "runtime~main.js": "/histomap/static/js/runtime~main.b9ef3423.js",
     "runtime~main.js.map": "/histomap/static/js/runtime~main.b9ef3423.js.map",
-    "static/js/2.483e229b.chunk.js": "/histomap/static/js/2.483e229b.chunk.js",
-    "static/js/2.483e229b.chunk.js.map": "/histomap/static/js/2.483e229b.chunk.js.map",
+    "static/js/2.b909605e.chunk.js": "/histomap/static/js/2.b909605e.chunk.js",
+    "static/js/2.b909605e.chunk.js.map": "/histomap/static/js/2.b909605e.chunk.js.map",
     "index.html": "/histomap/index.html",
-    "precache-manifest.cac77c4c87c7264299c6cdf2d15defe6.js": "/histomap/precache-manifest.cac77c4c87c7264299c6cdf2d15defe6.js",
+    "precache-manifest.3b5d2c9b84db1d4bafb7e1b6c9655f89.js": "/histomap/precache-manifest.3b5d2c9b84db1d4bafb7e1b6c9655f89.js",
     "service-worker.js": "/histomap/service-worker.js",
     "static/css/main.a40dd6d1.chunk.css.map": "/histomap/static/css/main.a40dd6d1.chunk.css.map",
     "static/media/logo.svg": "/histomap/static/media/logo.43f13564.svg"
