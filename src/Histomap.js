@@ -9,16 +9,17 @@ import { getRandomIntInclusive } from './lib/helper';
 class Histomap extends React.Component {
   constructor() {
     super();
-    const polities = Cycling.generatePolities(30);
+    const polities = Cycling.generatePolities(20);
     // const percents = Cycling.getPowerPercentages(polities);
     const percents = Cycling.getPolityPercentages(polities);
+    const events = [];
 
     this.state = {
       polities: polities,
       all_historical_polities: polities,
       width: window.innerWidth - 40,
       height: window.innerHeight,
-      history: [{polities, percents}],
+      history: [{polities, percents, events}],
     }
   }
 
@@ -28,7 +29,7 @@ class Histomap extends React.Component {
     // polities = await Cycling.run(polities, 300, 0);
     // this.setState({polities});
     // // console.table(this.state.polities);
-    for (let i = 0; i < 200; i ++) {
+    for (let i = 0; i < 50; i ++) {
       await this.step(500);
     }
   }
@@ -41,8 +42,9 @@ class Histomap extends React.Component {
 
     // const percents = Cycling.getPowerPercentages(polities);
     const percents = Cycling.getPolityPercentages(polities);
+    const events = Cycling.getEvents(polities);
 
-    const history = this.state.history.concat({polities, percents});
+    const history = this.state.history.concat({polities, percents, events});
     
     this.setState({ polities, history });
     // console.table(polities);
@@ -50,7 +52,7 @@ class Histomap extends React.Component {
 
   render() {
     return (
-      <Stage width={this.state.width} height={this.state.width}>
+      <Stage width={this.state.width} height={this.state.height}>
         <Layer>
           <Rect
             x={20}
