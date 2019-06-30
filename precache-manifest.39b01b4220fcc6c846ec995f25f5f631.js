@@ -1,19 +1,19 @@
 self.__precacheManifest = (self.__precacheManifest || []).concat([
   {
-    "revision": "4c0e4e78adc2c602311673a463758d5b",
+    "revision": "451c6e5d4fc37101176960e64fad63ba",
     "url": "/histomap/index.html"
   },
   {
-    "revision": "4ba2c201556d3128b36e",
+    "revision": "9443dbd8150048e283ab",
     "url": "/histomap/static/css/main.a40dd6d1.chunk.css"
   },
   {
-    "revision": "8535564c61a9c41bdfc6",
-    "url": "/histomap/static/js/2.b909605e.chunk.js"
+    "revision": "3df6e0bd2db23b798e75",
+    "url": "/histomap/static/js/2.7290cb5a.chunk.js"
   },
   {
-    "revision": "4ba2c201556d3128b36e",
-    "url": "/histomap/static/js/main.87f0f498.chunk.js"
+    "revision": "9443dbd8150048e283ab",
+    "url": "/histomap/static/js/main.f09300d3.chunk.js"
   },
   {
     "revision": "d3b9fbcdfe3cb58d682b",
