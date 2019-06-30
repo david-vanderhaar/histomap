@@ -65,7 +65,7 @@ const NEIGHBOR_DISTANCE = GRID_SIZE
 
 export const run = async (polities, steps_to_run, step_interval = 0) => {
   for (let i = 0; i < steps_to_run; i++) {
-    console.log(`%cTIME_STEP: ${i}`, "color: yellow; font-style: italic; background-color: blue;padding: 2px");
+    // console.log(`%cTIME_STEP: ${i}`, "color: yellow; font-style: italic; background-color: blue;padding: 2px");
     polities
     // .filter((polity) => polity.chief === null)
     .map((polity) => makeDecision(polity, polities));
@@ -111,6 +111,7 @@ const dismantlePolity = (polity, all_polities) => {
     if (i <= amount_to_secede - 1) {
       secede(s, all_polities);
     }
+    return true
   })
 }
 
@@ -222,6 +223,7 @@ const reorganizeInternalPolities = (chief, all_polities) => {
       } else {
         annex_pairs.push({chief, target: s})
       }
+      return true
     })
   }
   annex_pairs.map((pair) => {
@@ -230,6 +232,7 @@ const reorganizeInternalPolities = (chief, all_polities) => {
         p.chief = pair.chief.id
       }
     })
+    return true
   })
 }
 

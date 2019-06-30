@@ -1,7 +1,7 @@
 import React from 'react';
 import '../App.css';
 import * as Cycling from '../lib/turchin_cycling';
-import { Stage, Layer, Circle, Text, Line, Group } from 'react-konva';
+import { Text, Line, Group } from 'react-konva';
 
 class ChartView extends React.Component {
   state = {
@@ -38,7 +38,9 @@ class ChartView extends React.Component {
           }
           return line
         })
+        return true
       })
+      return true
     })
 
     let chart_pos_x = this.state.offset_x;
@@ -65,7 +67,7 @@ class ChartView extends React.Component {
           {
             this.props.polities.map((p, i) => {
               return (
-                <Group>
+                <Group key={i}>
                   <Text
                     x={20}
                     y={100 + (i * 50)}
@@ -113,7 +115,8 @@ class ChartView extends React.Component {
                   x={0}
                   y={0}
                   points={line.points.concat(extra_points)}
-                  stroke={line.polity.color}
+                  // stroke={line.polity.color}
+                  stroke={'#282C34'}
                   tension={0}
                   // bezier={true}
                   strokeWidth={4}
@@ -134,7 +137,7 @@ class ChartView extends React.Component {
                     0, i * this.state.step_distance,
                     this.props.width + this.state.offset_x, i * this.state.step_distance
                   ]}
-                  stroke={'black'}
+                  stroke={'#282C34'}
                   tension={0}
                   strokeWidth={2}
                 />
@@ -151,21 +154,30 @@ class ChartView extends React.Component {
                 const percentage = step.percents.filter((per) => per.polity_id === polity.id)[0].percent
                 const x_end = ((this.props.width - this.state.offset_x) * (percentage + all_previous_percents))
                 const x_begin = ((this.props.width - this.state.offset_x) * (all_previous_percents))
+                const x = x_begin + ((x_end - x_begin - (this.state.event_text_width / 2)) / 2);
                 const polity_events = step.events.filter((e) => e.polity_id === polity.id);
                 const event_log = polity_events.length > 0 ? polity_events[0].events : []
                 if (percentage > 0) {
                   return (
-                    <Text
-                      key={j}
-                      x={x_begin + ((x_end - x_begin - (this.state.event_text_width / 2)) / 2)}
-                      // x={j * (this.props.width - this.state.offset_x) / 10}
-                      y={((i * this.state.step_distance))}
-                      width={this.state.event_text_width}
-                      // y={((i * this.state.step_distance) + (j * 20))}
-                      text={event_log.length > 0 ? event_log[event_log.length - 1].message : 'none'}
-                      fill={'white'}
-                      fontSize={10}
-                    />
+                    <Group key={j}>
+                      <Text
+                        x={x}
+                        y={((i * this.state.step_distance))}
+                        width={this.state.event_text_width + 10}
+                        text={polity.name}
+                        fill={'white'}
+                        fontSize={20}
+                        fontStyle={'bold'}
+                      />
+                      <Text
+                        x={x}
+                        y={((i * this.state.step_distance) + 50)}
+                        width={this.state.event_text_width}
+                        text={event_log.length > 0 ? event_log[event_log.length - 1].message : 'none'}
+                        fill={'white'}
+                        fontSize={10}
+                      />
+                    </Group>
                   )
                 }
               })

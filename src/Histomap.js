@@ -3,8 +3,7 @@ import './App.css';
 import * as Cycling from './lib/turchin_cycling';
 import NodeView from './histomap/NodeView';
 import ChartView from './histomap/ChartView';
-import { Stage, Layer, Rect, Text, Line, Group } from 'react-konva';
-import { getRandomIntInclusive } from './lib/helper';
+import { Stage, Layer, Rect, Text } from 'react-konva';
 
 class Histomap extends React.Component {
   constructor() {
@@ -59,15 +58,16 @@ class Histomap extends React.Component {
             y={20}
             width={100}
             height={50}
-            fill={'red'}
+            fill={'#D8C99B'}
             onClick={() => this.step()}
           />
           <Text
             x={50}
-            y={40}
+            y={35}
             text={'Step'}
-            fill='black'
+            fill='#282C34'
             fontSize={20}
+            fontStyle={'bold'}
           />
         </Layer>
         <Layer>
