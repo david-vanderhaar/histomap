@@ -1,16 +1,15 @@
 {
   "files": {
     "main.css": "/histomap/static/css/main.a40dd6d1.chunk.css",
-    "main.js": "/histomap/static/js/main.f09300d3.chunk.js",
-    "main.js.map": "/histomap/static/js/main.f09300d3.chunk.js.map",
+    "main.js": "/histomap/static/js/main.d0154bae.chunk.js",
+    "main.js.map": "/histomap/static/js/main.d0154bae.chunk.js.map",
     "runtime~main.js": "/histomap/static/js/runtime~main.b9ef3423.js",
     "runtime~main.js.map": "/histomap/static/js/runtime~main.b9ef3423.js.map",
-    "static/js/2.7290cb5a.chunk.js": "/histomap/static/js/2.7290cb5a.chunk.js",
-    "static/js/2.7290cb5a.chunk.js.map": "/histomap/static/js/2.7290cb5a.chunk.js.map",
+    "static/js/2.b6a83600.chunk.js": "/histomap/static/js/2.b6a83600.chunk.js",
+    "static/js/2.b6a83600.chunk.js.map": "/histomap/static/js/2.b6a83600.chunk.js.map",
     "index.html": "/histomap/index.html",
-    "precache-manifest.39b01b4220fcc6c846ec995f25f5f631.js": "/histomap/precache-manifest.39b01b4220fcc6c846ec995f25f5f631.js",
+    "precache-manifest.050e9a8f440a569e51d355f236794aa6.js": "/histomap/precache-manifest.050e9a8f440a569e51d355f236794aa6.js",
     "service-worker.js": "/histomap/service-worker.js",
-    "static/css/main.a40dd6d1.chunk.css.map": "/histomap/static/css/main.a40dd6d1.chunk.css.map",
-    "static/media/logo.svg": "/histomap/static/media/logo.43f13564.svg"
+    "static/css/main.a40dd6d1.chunk.css.map": "/histomap/static/css/main.a40dd6d1.chunk.css.map"
   }
 }
