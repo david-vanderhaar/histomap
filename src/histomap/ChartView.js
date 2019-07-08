@@ -1,18 +1,22 @@
 import React from 'react';
 import '../App.css';
 import * as Cycling from '../lib/turchin_cycling';
-import { Text, Line, Group } from 'react-konva';
+import { Text, Line, Group, Rect } from 'react-konva';
+import * as Styles from '../styles';
 
 class ChartView extends React.Component {
-  state = {
-    // step_distance: 30,
-    step_distance: 100,
-    entity_distance: 40,
-    offset_x: 160,
-    offset_y: 25,
-    previous_polity_power: 0,
-    padding_right: 20,
-    event_text_width: 60,
+  constructor(props) {
+    super(props)
+    this.state = {
+      // step_distance: 30,
+      step_distance: 100,
+      entity_distance: 40,
+      offset_x: props.offset_x,
+      offset_y: props.offset_y,
+      previous_polity_power: 0,
+      padding_right: props.offset_x,
+      event_text_width: 60,
+    }
   }
 
   render() {
@@ -65,26 +69,26 @@ class ChartView extends React.Component {
           }
         >
           {
-            this.props.polities.map((p, i) => {
-              return (
-                <Group key={i}>
-                  <Text
-                    x={20}
-                    y={100 + (i * 50)}
-                    text={p.name}
-                    fill={p.color}
-                    fontSize={20}
-                    />
-                  <Text
-                    x={20}
-                    y={120 + (i * 50)}
-                    text={Math.round(Cycling.getPower(p, this.props.polities) * 100) / 100}
-                    fill={p.color}
-                    fontSize={20}
-                  />
-                </Group>
-              )
-            })
+            // this.props.polities.map((p, i) => {
+            //   return (
+            //     <Group key={i}>
+            //       <Text
+            //         x={20}
+            //         y={100 + (i * 50)}
+            //         text={p.name}
+            //         fill={p.color}
+            //         fontSize={20}
+            //         />
+            //       <Text
+            //         x={20}
+            //         y={120 + (i * 50)}
+            //         text={Math.round(Cycling.getPower(p, this.props.polities) * 100) / 100}
+            //         fill={p.color}
+            //         fontSize={20}
+            //       />
+            //     </Group>
+            //   )
+            // })
           }
         </Group>
         <Group 
@@ -116,7 +120,9 @@ class ChartView extends React.Component {
                   y={0}
                   points={line.points.concat(extra_points)}
                   // stroke={line.polity.color}
-                  stroke={'#282C34'}
+                  stroke={Styles.themes[this.props.theme].background}
+                  // stroke={'#eadcbd'}
+                  // stroke={'#282C34'}
                   tension={0}
                   // bezier={true}
                   strokeWidth={4}
@@ -129,18 +135,41 @@ class ChartView extends React.Component {
           {
             this.props.history.map((step, i) => {
               return (
-                <Line
-                  key={i}
-                  x={-5}
-                  y={0}
-                  points={[
-                    0, i * this.state.step_distance,
-                    this.props.width + this.state.offset_x, i * this.state.step_distance
-                  ]}
-                  stroke={'#282C34'}
-                  tension={0}
-                  strokeWidth={2}
-                />
+                <Group>
+                  <Text
+                    x={(this.props.side_info_width - this.state.offset_x)}
+                    y={(i * this.state.step_distance) - 25}
+                    width={this.props.side_info_width}
+                    text={`${i * this.props.years_to_run}`}
+                    fill={Styles.themes[this.props.theme].element_body}
+                    fontSize={20}
+                    fontStyle={'bold'}
+                    align={'center'}
+                  />
+                  <Line
+                    key={i}
+                    x={0}
+                    y={0}
+                    points={[
+                      this.props.side_info_width - this.state.offset_x, i * this.state.step_distance,
+                      (this.props.width - this.state.offset_x + this.props.side_info_width), i * this.state.step_distance
+                    ]}
+                    stroke={Styles.themes[this.props.theme].chart_lines}
+                    tension={0}
+                    strokeWidth={2}
+                  />
+                  <Text
+                    x={(this.props.width - this.state.offset_x)}
+                    // x={(this.props.side_info_width - this.state.offset_x)}
+                    y={(i * this.state.step_distance) - 25}
+                    width={this.props.side_info_width}
+                    text={`${i * this.props.years_to_run}`}
+                    fill={Styles.themes[this.props.theme].element_body}
+                    fontSize={20}
+                    fontStyle={'bold'}
+                    align={'center'}
+                  />
+                </Group>
               )
             })
           }
@@ -155,27 +184,27 @@ class ChartView extends React.Component {
                 const x_end = ((this.props.width - this.state.offset_x) * (percentage + all_previous_percents))
                 const x_begin = ((this.props.width - this.state.offset_x) * (all_previous_percents))
                 const x = x_begin + ((x_end - x_begin - (this.state.event_text_width / 2)) / 2);
+                const text_padding = 16;
                 const polity_events = step.events.filter((e) => e.polity_id === polity.id);
                 const event_log = polity_events.length > 0 ? polity_events[0].events : []
-                if (percentage > 0) {
+                if (percentage > 0.06) {
                   return (
                     <Group key={j}>
                       <Text
-                        x={x}
-                        y={((i * this.state.step_distance))}
-                        width={this.state.event_text_width + 10}
-                        text={polity.name}
-                        fill={'white'}
-                        fontSize={20}
+                        x={x_begin + text_padding}
+                        // x={x}
+                        y={((i * this.state.step_distance) - (this.state.step_distance / 2))}
+                        // y={((i * this.state.step_distance))}
+                        width={x_end - x_begin - text_padding}
+                        // width={this.state.event_text_width + 10}
+                        text={
+                          `${polity.name.toUpperCase()}\n${event_log.length > 0 ? event_log[event_log.length - 1].message : 'none'}`
+                        }
+                        // fill={'black'}
+                        fill={Styles.themes[this.props.theme].element_body}
+                        fontSize={12}
                         fontStyle={'bold'}
-                      />
-                      <Text
-                        x={x}
-                        y={((i * this.state.step_distance) + 50)}
-                        width={this.state.event_text_width}
-                        text={event_log.length > 0 ? event_log[event_log.length - 1].message : 'none'}
-                        fill={'white'}
-                        fontSize={10}
+                        align={'center'}
                       />
                     </Group>
                   )

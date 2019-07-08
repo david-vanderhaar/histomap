@@ -1,6 +1,16 @@
+body {
+  /* background-color: #282c34; */
+  /* background-color: #eadcbd; */
+}
+
 .App {
   text-align: center;
-  background-color: #282c34;
+  /* background-color: #282c34; */
+  /* background-color: #eadcbd; */
+}
+
+.Stage {
+  padding-top: 20px
 }
 
 .App-logo {
@@ -23,6 +33,10 @@
 
 .App-link {
   color: #61dafb;
+}
+
+.konvajs-content {
+  margin: auto;
 }
 
 @keyframes App-logo-spin {

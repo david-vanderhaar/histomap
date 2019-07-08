@@ -78,7 +78,8 @@ export const run = async (polities, steps_to_run, step_interval = 0) => {
 export const generatePolities = (amount) => {
   let polities = [];
   for (let i = 0; i < amount; i++) {
-    polities.push(createPolity());
+    const color = colors.entity[i % colors.entity.length]
+    polities.push(createPolity(color));
   }
   return polities;
 }
@@ -538,7 +539,7 @@ export const getPowerPercentages = (polities) => {
   })
 }
 
-export function createPolity() {
+export function createPolity(color) {
   const baseline_resource_level = 1 + (getRandomIntInclusive(-1, 1) * RESOURCE_BASELINE_DEVIATION)
 
   let polity = {
@@ -555,7 +556,8 @@ export function createPolity() {
     has_incurred_war: false,
     chief_age: 30,
     events: [],
-    color: Konva.Util.getRandomColor(),
+    // color: Konva.Util.getRandomColor(),
+    color,
   }
   return polity;
 }
@@ -597,4 +599,17 @@ const nameSuffixes = [
 
 const composeName = (namePartLists = []) => {
   return namePartLists.map((list) => getRandomInArray(list)).join(' ')
+}
+
+const colors = {
+  background: '#eadcbd',
+  entity: [
+    '#de6640',
+    '#e39d96',
+    '#e8c4ac',
+    '#ebd66b',
+    '#638c5f',
+    '#869f9b',
+    '#cac9b4',
+  ],
 }
