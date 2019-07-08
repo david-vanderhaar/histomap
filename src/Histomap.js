@@ -10,8 +10,8 @@ class Histomap extends React.Component {
   constructor() {
     super();
     const polities = Cycling.generatePolities(20);
-    const percents = Cycling.getPowerPercentages(polities);
-    // const percents = Cycling.getPolityPercentages(polities);
+    // const percents = Cycling.getPowerPercentages(polities);
+    const percents = Cycling.getPolityPercentages(polities);
     const events = [];
     const chart_padding = 180;
     const side_info_width = 80;
@@ -45,8 +45,8 @@ class Histomap extends React.Component {
     // let random_index = getRandomIntInclusive(0, polities.length);
     // polities = polities.filter((p, i) => i !== random_index)
 
-    const percents = Cycling.getPowerPercentages(polities);
-    // const percents = Cycling.getPolityPercentages(polities);
+    // const percents = Cycling.getPowerPercentages(polities);
+    const percents = Cycling.getPolityPercentages(polities);
     const events = Cycling.getEvents(polities);
 
     const history = this.state.history.concat({polities, percents, events});
