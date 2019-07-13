@@ -57,7 +57,7 @@ class ChartView extends React.Component {
 
     return (
       <Group>
-        <Group
+        {/* <Group
           draggable={true}
           dragBoundFunc={
             (pos) => {
@@ -69,28 +69,28 @@ class ChartView extends React.Component {
           }
         >
           {
-            // this.props.polities.map((p, i) => {
-            //   return (
-            //     <Group key={i}>
-            //       <Text
-            //         x={20}
-            //         y={100 + (i * 50)}
-            //         text={p.name}
-            //         fill={p.color}
-            //         fontSize={20}
-            //         />
-            //       <Text
-            //         x={20}
-            //         y={120 + (i * 50)}
-            //         text={Math.round(Cycling.getPower(p, this.props.polities) * 100) / 100}
-            //         fill={p.color}
-            //         fontSize={20}
-            //       />
-            //     </Group>
-            //   )
-            // })
+            this.props.polities.map((p, i) => {
+              return (
+                <Group key={i}>
+                  <Text
+                    x={20}
+                    y={100 + (i * 50)}
+                    text={p.name}
+                    fill={p.color}
+                    fontSize={20}
+                    />
+                  <Text
+                    x={20}
+                    y={120 + (i * 50)}
+                    text={Math.round(Cycling.getPower(p, this.props.polities) * 100) / 100}
+                    fill={p.color}
+                    fontSize={20}
+                  />
+                </Group>
+              )
+            })
           }
-        </Group>
+        </Group> */}
         <Group 
           x={chart_pos_x} 
           y={chart_pos_y}
@@ -213,6 +213,16 @@ class ChartView extends React.Component {
             })
           }
         </Group>
+        {/* <Rect
+          x={this.props.side_info_width}
+          y={0}
+          width={this.props.width}
+          height={this.props.height}
+          stroke={Styles.themes[this.props.theme].element_body}
+          strokeWidth={4}
+        // fill={Styles.themes[this.props.theme].element_body}
+        // onClick={() => this.step()}
+        /> */}
       </Group>
     );
   }

@@ -9,8 +9,24 @@ body {
   /* background-color: #eadcbd; */
 }
 
-.Stage {
-  padding-top: 20px
+.top-section h1 {
+  font-family: 'Notable'
+}
+
+.top-section p {
+  margin: 6px 0;
+  /* margin-top: 4; */
+  /* margin-bottom: 4; */
+  font-size: 20px;
+}
+
+.bottom-section {
+  display: flex;
+  justify-content: space-around;
+}
+
+.bottom-section .bottom-section-text {
+  font-size: 12px;
 }
 
 .App-logo {

@@ -15,13 +15,21 @@ class Histomap extends React.Component {
     const events = [];
     const chart_padding = 180;
     const side_info_width = 80;
+    const top_section_height = 200;
+    const bottom_section_height = 60;
+    const stage_padding_top = 20;
+
     this.state = {
       polities: polities,
       all_historical_polities: polities,
       chart_padding,
       side_info_width,
       width: window.innerWidth - chart_padding,
-      height: window.innerHeight,
+      // height: window.innerHeight - (top_section_height + stage_padding_top),
+      height: window.innerHeight - (top_section_height + bottom_section_height + stage_padding_top),
+      stage_padding_top,
+      top_section_height,
+      bottom_section_height,
       history: [{polities, percents, events}],
       years_to_run: 10,
       step_interval: 500,
@@ -58,42 +66,25 @@ class Histomap extends React.Component {
   render() {
     return (
       <div>
-        <h1 style={{color: Styles.themes[this.props.theme].element_body, margin: 0}}>The HISTOMAP</h1>
-        <p style={{ color: Styles.themes[this.props.theme].element_body}}>
-          {`${this.state.history.length * this.state.years_to_run} year${this.state.history.length > 1 ? 's' : ''} of world history`.toUpperCase()}
-        </p>
-        <p style={{ color: Styles.themes[this.props.theme].element_body}}>{`Relative power of contemporary states, nations, and empires`.toUpperCase()}</p>
-        <button 
-          onClick={() => this.step()} 
-          className="btn"
-          style={{
-            backgroundColor: Styles.themes[this.props.theme].element_body,
-            color: Styles.themes[this.props.theme].element_text
-          }}
-        >
-          Step
-        </button>
-        <div className='Stage'>
+        <div className='top-section' style={{height: this.state.top_section_height}}>
+          <h1 style={{color: Styles.themes[this.props.theme].element_body, margin: 0}}>The HISTOMAP</h1>
+          <p style={{ color: Styles.themes[this.props.theme].element_body}}>
+            {`${this.state.history.length * this.state.years_to_run} year${this.state.history.length > 1 ? 's' : ''} of world history`.toUpperCase()}
+          </p>
+          <p style={{ color: Styles.themes[this.props.theme].element_body}}>{`Relative power of contemporary states, nations, and empires`.toUpperCase()}</p>
+          <button 
+            onClick={() => this.step()} 
+            className="btn"
+            style={{
+              backgroundColor: Styles.themes[this.props.theme].element_body,
+              color: Styles.themes[this.props.theme].element_text
+            }}
+          >
+            Step
+          </button>
+        </div>
+        <div className='Stage' style={{ paddingTop: this.state.stage_padding_top }}>
           <Stage width={this.state.width} height={this.state.height}>
-            {/* <Layer>
-              <Rect
-                x={20}
-                y={0}
-                width={100}
-                height={50}
-                fill={Styles.themes[this.props.theme].element_body}
-                onClick={() => this.step()}
-              />
-              <Text
-                x={50}
-                y={35}
-                text={'Step'}
-                fill={Styles.themes[this.props.theme].element_text}
-                fontSize={20}
-                fontStyle={'bold'}
-                onClick={() => this.step()}
-              />
-            </Layer> */}
             <Layer>
               {/* <NodeView 
                 polities={this.state.polities} 
@@ -108,13 +99,18 @@ class Histomap extends React.Component {
                 years_to_run={this.state.years_to_run} 
                 side_info_width={this.state.side_info_width}
                 width={this.state.width - this.state.side_info_width} 
-                height={this.state.height}
+                height={this.state.height - this.state.stage_padding_top}
                 offset_x={this.state.chart_padding}
                 // offset_x={0}
                 offset_y={85}
               />
             </Layer>
           </Stage>
+        </div>
+        <div className='bottom-section' style={{ height: this.state.bottom_section_height }}>
+          <span style={{ color: Styles.themes[this.props.theme].element_body}} className='bottom-section-text'>Copyright by David A. Vanderhaar</span>
+          <span style={{ color: Styles.themes[this.props.theme].element_body}} className='bottom-section-text'>Made with React and Konva</span>
+          <span style={{ color: Styles.themes[this.props.theme].element_body}} className='bottom-section-text'>Model based on Peter Turchin's Cycling in the Complexity of Early Societies</span>
         </div>
       </div>
     )
