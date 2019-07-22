@@ -3,6 +3,7 @@ import './App.css';
 import * as Cycling from './lib/turchin_cycling';
 import NodeView from './histomap/NodeView';
 import ChartView from './histomap/ChartView';
+import Toolbar from './histomap/components/Toolbar';
 import { Stage, Layer, Rect, Text } from 'react-konva';
 import * as Styles from './styles';
 
@@ -32,6 +33,8 @@ class Histomap extends React.Component {
       bottom_section_height,
       history: [{polities, percents, events}],
       years_to_run: 10,
+      running_sim: false,
+      running_sim_reference: null,
       step_interval: 500,
     }
   }
@@ -42,12 +45,28 @@ class Histomap extends React.Component {
     // polities = await Cycling.run(polities, 300, 0);
     // this.setState({polities});
     // // console.table(this.state.polities);
-    for (let i = 0; i < 10; i ++) {
-      await this.step(this.state.years_to_run, (this.state.step_interval / this.state.years_to_run));
-    }
+    // for (let i = 0; i < 10; i ++) {
+    //   await this.step(this.state.years_to_run, (this.state.step_interval / this.state.years_to_run));
+    // }
+    // while (this.state.running_sim_reference !== null) {
+    //   await this.step(this.state.years_to_run, (this.state.step_interval / this.state.years_to_run));
+    // }
+  }
+
+  async start () {
+    console.log('start');
+    await this.setState({running_sim: true})
+    await this.step(this.state.years_to_run, (this.state.step_interval / this.state.years_to_run));
+  }
+  
+  pause () {
+    console.log('pause');
+    this.setState({running_sim: false})
   }
 
   async step (years_to_run = 1, step_interval = 0) {
+    console.log('step');
+    
     let polities = await Cycling.run([...this.state.polities], years_to_run, step_interval);
     // testing out when a polity is removed
     // let random_index = getRandomIntInclusive(0, polities.length);
@@ -59,8 +78,12 @@ class Histomap extends React.Component {
 
     const history = this.state.history.concat({polities, percents, events});
     
-    this.setState({ polities, history });
+    await this.setState({ polities, history });
     // console.table(polities);
+
+    if (this.state.running_sim) {
+      await this.step(years_to_run, (step_interval / years_to_run));
+    }
   }
 
   render() {
@@ -72,16 +95,13 @@ class Histomap extends React.Component {
             {`${this.state.history.length * this.state.years_to_run} year${this.state.history.length > 1 ? 's' : ''} of world history`.toUpperCase()}
           </p>
           <p style={{ color: Styles.themes[this.props.theme].element_body}}>{`Relative power of contemporary states, nations, and empires`.toUpperCase()}</p>
-          <button 
-            onClick={() => this.step()} 
-            className="btn"
-            style={{
-              backgroundColor: Styles.themes[this.props.theme].element_body,
-              color: Styles.themes[this.props.theme].element_text
-            }}
-          >
-            Step
-          </button>
+          <Toolbar 
+            theme={this.props.theme}
+            running_sim={this.state.running_sim}
+            onStart={this.start.bind(this)}
+            onPause={this.pause.bind(this)}
+            onStep={this.step.bind(this)}
+          />
         </div>
         <div className='Stage' style={{ paddingTop: this.state.stage_padding_top }}>
           <Stage width={this.state.width} height={this.state.height}>
