@@ -6,6 +6,7 @@ import ChartView from './histomap/ChartView';
 import Toolbar from './histomap/components/Toolbar';
 import { Stage, Layer, Rect, Text } from 'react-konva';
 import * as Styles from './styles';
+import { delay } from "q";
 
 class Histomap extends React.Component {
   constructor() {
@@ -37,6 +38,7 @@ class Histomap extends React.Component {
       running_sim_reference: null,
       step_interval: 500,
     }
+    
   }
 
   async componentDidMount () {
@@ -56,12 +58,35 @@ class Histomap extends React.Component {
   async start () {
     console.log('start');
     await this.setState({running_sim: true})
-    await this.step(this.state.years_to_run, (this.state.step_interval / this.state.years_to_run));
+    await this.continuousStep(this.state.years_to_run, (this.state.step_interval / this.state.years_to_run));
   }
   
   pause () {
     console.log('pause');
     this.setState({running_sim: false})
+  }
+
+  async continuousStep (years_to_run = 1, step_interval = 0) {
+    console.log('step');
+    
+    let polities = await Cycling.run([...this.state.polities], years_to_run, step_interval);
+    // testing out when a polity is removed
+    // let random_index = getRandomIntInclusive(0, polities.length);
+    // polities = polities.filter((p, i) => i !== random_index)
+
+    // const percents = Cycling.getPowerPercentages(polities);
+    const percents = Cycling.getPolityPercentages(polities);
+    const events = Cycling.getEvents(polities);
+
+    const history = this.state.history.concat({polities, percents, events});
+    
+    await this.setState({ polities, history });
+    // console.table(polities);
+
+    await delay(this.state.step_interval);
+    if (this.state.running_sim) {
+      await this.continuousStep(years_to_run, (step_interval / years_to_run));
+    }
   }
 
   async step (years_to_run = 1, step_interval = 0) {
@@ -80,10 +105,6 @@ class Histomap extends React.Component {
     
     await this.setState({ polities, history });
     // console.table(polities);
-
-    if (this.state.running_sim) {
-      await this.step(years_to_run, (step_interval / years_to_run));
-    }
   }
 
   render() {
