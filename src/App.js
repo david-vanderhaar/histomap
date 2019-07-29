@@ -1,12 +1,19 @@
-import React from 'react';
+import React, { useState } from 'react';
 import './App.css';
 import Histomap from './Histomap';
 import * as Styles from './styles';
 
-const theme = 'light';
-// const theme = 'dark';
+const switchTheme = (theme) => {
+  if (theme === 'light') {
+    return 'dark';
+  } else {
+    return 'light';
+  }
+}
 
 function App() {
+  const [theme, setTheme] = useState('light');
+
   return (
     <div className="App" style={{
       backgroundColor: Styles.themes[theme].background,
@@ -17,7 +24,7 @@ function App() {
         <img src={logo} className="App-logo" alt="logo" />
         <h2>Histomap</h2>
       </div> */}
-        <Histomap theme={theme}/>
+      <Histomap onSwitchTheme={() => { setTheme(switchTheme(theme))}} theme={theme}/>
     </div>
   );
 }

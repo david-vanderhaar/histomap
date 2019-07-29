@@ -39,7 +39,7 @@ function Toolbar(props) {
         Step
       </button>
       <button
-        onClick={() => props.onStep()}
+        onClick={() => props.onReset()}
         className="btn"
         style={{
           backgroundColor: Styles.themes[props.theme].element_body,
@@ -47,6 +47,20 @@ function Toolbar(props) {
         }}
       >
         Reset
+      </button>
+      <button
+        onClick={() => props.onSwitchTheme()}
+        className="btn"
+        style={{
+          backgroundColor: Styles.themes[props.theme].element_body,
+          color: Styles.themes[props.theme].element_text
+        }}
+      >
+        {
+          props.theme === 'light' 
+            ? 'Go Dark' 
+            : 'Go Light'
+        }
       </button>
     </div>
   );
