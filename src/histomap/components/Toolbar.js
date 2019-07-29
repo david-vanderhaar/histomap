@@ -39,6 +39,16 @@ function Toolbar(props) {
         Step
       </button>
       <button
+        onClick={() => props.onRestart()}
+        className="btn"
+        style={{
+          backgroundColor: Styles.themes[props.theme].element_body,
+          color: Styles.themes[props.theme].element_text
+        }}
+      >
+        Restart
+      </button>
+      <button
         onClick={() => props.onReset()}
         className="btn"
         style={{
@@ -46,7 +56,7 @@ function Toolbar(props) {
           color: Styles.themes[props.theme].element_text
         }}
       >
-        Reset
+        New History
       </button>
       <button
         onClick={() => props.onSwitchTheme()}

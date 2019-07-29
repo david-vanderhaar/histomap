@@ -115,6 +115,19 @@ class Histomap extends React.Component {
     });
   }
 
+  restart () {
+    const polities = this.state.all_historical_polities;
+    const percents = Cycling.getPowerPercentages(polities);
+    // const percents = Cycling.getPolityPercentages(polities);
+    const events = [];
+    const history = [{ polities, percents, events }];
+
+    this.setState({
+      polities,
+      history,
+    });
+  }
+
   render() {
     return (
       <div>
@@ -131,6 +144,7 @@ class Histomap extends React.Component {
             onPause={this.pause.bind(this)}
             onStep={this.step.bind(this)}
             onReset={this.reset.bind(this)}
+            onRestart={this.restart.bind(this)}
             onSwitchTheme={this.props.onSwitchTheme}
           />
         </div>
