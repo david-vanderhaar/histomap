@@ -14,7 +14,7 @@
 importScripts("https://storage.googleapis.com/workbox-cdn/releases/4.3.1/workbox-sw.js");
 
 importScripts(
-  "/histomap/precache-manifest.324c47494cc44426e8909833ebc3b44c.js"
+  "/histomap/precache-manifest.8a6ae33f9c57d96bf91c000cd149cd54.js"
 );
 
 self.addEventListener('message', (event) => {
