@@ -1,14 +1,14 @@
 {
   "files": {
     "main.css": "/histomap/static/css/main.774b87d5.chunk.css",
-    "main.js": "/histomap/static/js/main.e6efb1af.chunk.js",
-    "main.js.map": "/histomap/static/js/main.e6efb1af.chunk.js.map",
+    "main.js": "/histomap/static/js/main.9c843a24.chunk.js",
+    "main.js.map": "/histomap/static/js/main.9c843a24.chunk.js.map",
     "runtime~main.js": "/histomap/static/js/runtime~main.b9ef3423.js",
     "runtime~main.js.map": "/histomap/static/js/runtime~main.b9ef3423.js.map",
     "static/js/2.655ffa7d.chunk.js": "/histomap/static/js/2.655ffa7d.chunk.js",
     "static/js/2.655ffa7d.chunk.js.map": "/histomap/static/js/2.655ffa7d.chunk.js.map",
     "index.html": "/histomap/index.html",
-    "precache-manifest.8a6ae33f9c57d96bf91c000cd149cd54.js": "/histomap/precache-manifest.8a6ae33f9c57d96bf91c000cd149cd54.js",
+    "precache-manifest.e5641bb750da72feb633ad6d452fa7c6.js": "/histomap/precache-manifest.e5641bb750da72feb633ad6d452fa7c6.js",
     "service-worker.js": "/histomap/service-worker.js",
     "static/css/main.774b87d5.chunk.css.map": "/histomap/static/css/main.774b87d5.chunk.css.map"
   }
