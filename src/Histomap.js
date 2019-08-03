@@ -4,6 +4,7 @@ import * as Cycling from './lib/turchin_cycling';
 import NodeView from './histomap/NodeView';
 import ChartView from './histomap/ChartView';
 import Toolbar from './histomap/components/Toolbar';
+import Sidenav from './histomap/components/Sidenav';
 import { Stage, Layer, Rect, Text } from 'react-konva';
 import * as Styles from './styles';
 import { delay } from "q";
@@ -131,6 +132,7 @@ class Histomap extends React.Component {
   render() {
     return (
       <div>
+        <Sidenav theme={this.props.theme} />
         <div className='top-section' style={{height: this.state.top_section_height}}>
           <h1 style={{color: Styles.themes[this.props.theme].element_body, margin: 0}}>The HISTOMAP</h1>
           <p style={{ color: Styles.themes[this.props.theme].element_body}}>
