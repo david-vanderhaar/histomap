@@ -38,8 +38,9 @@ class Histomap extends React.Component {
       running_sim: false,
       running_sim_reference: null,
       step_interval: 500,
+      chart_view: true,
     }
-    
+    this.stage_ref = React.createRef();
   }
 
   async componentDidMount () {
@@ -63,6 +64,10 @@ class Histomap extends React.Component {
   
   pause () {
     this.setState({running_sim: false})
+  }
+
+  onSwitchView () {
+    this.setState({chart_view: !this.state.chart_view})
   }
 
   async continuousStep (years_to_run = 1, step_interval = 0) {
@@ -148,29 +153,41 @@ class Histomap extends React.Component {
             onReset={this.reset.bind(this)}
             onRestart={this.restart.bind(this)}
             onSwitchTheme={this.props.onSwitchTheme}
+            onSwitchView={this.onSwitchView.bind(this)}
+            chart_view={this.state.chart_view}
+            stage_ref={this.stage_ref}
           />
         </div>
         <div className='Stage' style={{ paddingTop: this.state.stage_padding_top }}>
-          <Stage width={this.state.width} height={this.state.height}>
+          <Stage ref={this.stage_ref} width={this.state.width} height={this.state.height}>
             <Layer>
-              {/* <NodeView 
-                polities={this.state.polities} 
-                width={this.state.width} 
-                height={this.state.height}
-              /> */}
-              <ChartView 
-                theme={this.props.theme}
-                polities={this.state.polities} 
-                all_historical_polities={this.state.all_historical_polities} 
-                history={this.state.history}
-                years_to_run={this.state.years_to_run} 
-                side_info_width={this.state.side_info_width}
-                width={this.state.width - this.state.side_info_width} 
-                height={this.state.height - this.state.stage_padding_top}
-                offset_x={this.state.chart_padding}
-                // offset_x={0}
-                offset_y={85}
-              />
+              {
+                this.state.chart_view && (
+                  <ChartView
+                    theme={this.props.theme}
+                    polities={this.state.polities}
+                    all_historical_polities={this.state.all_historical_polities}
+                    history={this.state.history}
+                    years_to_run={this.state.years_to_run}
+                    side_info_width={this.state.side_info_width}
+                    width={this.state.width - this.state.side_info_width}
+                    height={this.state.height - this.state.stage_padding_top}
+                    offset_x={this.state.chart_padding}
+                    // offset_x={0}
+                    offset_y={85}
+                  />
+                )
+              }
+              {
+                !this.state.chart_view && (
+                  <NodeView
+                    polities={this.state.polities}
+                    width={this.state.width}
+                    height={this.state.height}
+                  />
+                )
+              }
+              
             </Layer>
           </Stage>
         </div>

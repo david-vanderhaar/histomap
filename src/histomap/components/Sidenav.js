@@ -5,7 +5,6 @@ import Button from '@material-ui/core/Button';
 import List from '@material-ui/core/List';
 import Divider from '@material-ui/core/Divider';
 import ListItem from '@material-ui/core/ListItem';
-import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
 import InboxIcon from '@material-ui/icons/MoveToInbox';
 import MailIcon from '@material-ui/icons/Mail';
@@ -14,7 +13,7 @@ import * as Styles from '../../styles';
 
 const useStyles = makeStyles({
   list: {
-    width: 250,
+    width: 500,
   },
   fullList: {
     width: 'auto',
@@ -38,6 +37,10 @@ export default function TemporaryDrawer(props) {
     setState({ ...state, [side]: open });
   };
 
+  const ListItemLink = (props) => {
+    return <ListItem button style={{ color: '#de6640'}} component="a" {...props} />;
+  }
+
   const sideList = side => (
     <div
       className={classes.list}
@@ -46,22 +49,30 @@ export default function TemporaryDrawer(props) {
       onKeyDown={toggleDrawer(side, false)}
     >
       <List>
-        {['Inbox', 'Starred', 'Send email', 'Drafts'].map((text, index) => (
-          <ListItem button key={text}>
-            <ListItemIcon>{index % 2 === 0 ? <InboxIcon /> : <MailIcon />}</ListItemIcon>
-            <ListItemText primary={text} />
-          </ListItem>
-        ))}
+        <ListItem>
+          <h4>About</h4>
+        </ListItem>
+        <ListItem>
+          <ListItemText>
+            This is intended generate histomaps similar to John B. Sparks 1931 piece, titled “The Histomap: Four Thousand Years of World History.”
+          </ListItemText>
+        </ListItem>
+        <ListItem>
+          <ListItemText>
+            To simulate an early history I interpret Peter Turchin's model for Cycling in the Complexity of Early Societies.
+          </ListItemText>
+        </ListItem>
       </List>
       <Divider />
       <List>
-        {['All mail', 'Trash', 'Spam'].map((text, index) => (
-          <ListItem button key={text}>
-            <ListItemIcon>{index % 2 === 0 ? <InboxIcon /> : <MailIcon />}</ListItemIcon>
-            <ListItemText primary={text} />
-          </ListItem>
-        ))}
+        <ListItemLink href="https://www.worldhistorycharts.com/the-histomap-by-john-sparks/">
+          <ListItemText primary="The Histomap by John B. Sparks" />
+        </ListItemLink>
+        <ListItemLink href="https://escholarship.org/uc/item/5536t55r#page-1">
+          <ListItemText primary="Cycling in the Complexity of Early Societies by Peter Turchin" />
+        </ListItemLink>
       </List>
+      <Divider />
     </div>
   );
 

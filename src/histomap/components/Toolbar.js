@@ -12,6 +12,16 @@ function Toolbar(props) {
     }
   }
 
+  const downloadURI = (uri, name) => {
+    let link = document.createElement('a');
+    link.download = name;
+    link.href = uri;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    // delete link;
+  }
+
   return (
     <div className="Toolbar">
       <button
@@ -72,6 +82,36 @@ function Toolbar(props) {
             : 'Go Light'
         }
       </button>
+      <button
+        onClick={() => props.onSwitchView()}
+        className="btn"
+        style={{
+          backgroundColor: Styles.themes[props.theme].element_body,
+          color: Styles.themes[props.theme].element_text
+        }}
+      >
+        {
+          props.chart_view
+            ? 'Node View' 
+            : 'Chart View'
+        }
+      </button>
+      {/* <button
+        onClick={() => {
+            let dataURL = props.stage_ref.current.toDataURL()
+            downloadURI(dataURL, 'the_histomap.png');
+          // console.log(props.stage_ref.current);
+            
+          }
+        }
+        className="btn"
+        style={{
+          backgroundColor: Styles.themes[props.theme].element_body,
+          color: Styles.themes[props.theme].element_text
+        }}
+      >
+        Print
+      </button> */}
     </div>
   );
 }
