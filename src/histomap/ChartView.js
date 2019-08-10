@@ -187,7 +187,7 @@ class ChartView extends React.Component {
                 const text_padding = 16;
                 const polity_events = step.events.filter((e) => e.polity_id === polity.id);
                 const event_log = polity_events.length > 0 ? polity_events[0].events : []
-                if (percentage > 0.06) {
+                if (percentage > 0.08) {
                   return (
                     <Group key={j}>
                       <Text
@@ -201,7 +201,7 @@ class ChartView extends React.Component {
                           `${polity.name.toUpperCase()}\n${event_log.length > 0 ? event_log[event_log.length - 1].message : 'none'}`
                         }
                         // fill={'black'}
-                        fill={Styles.themes[this.props.theme].element_body}
+                        fill={Styles.themes['light'].element_body}
                         fontSize={12}
                         fontStyle={'bold'}
                         align={'center'}

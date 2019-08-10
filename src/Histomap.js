@@ -12,7 +12,7 @@ import { delay } from "q";
 class Histomap extends React.Component {
   constructor() {
     super();
-    const polities = Cycling.generatePolities(20);
+    const polities = Cycling.generatePolities(10);
     const percents = Cycling.getPowerPercentages(polities);
     // const percents = Cycling.getPolityPercentages(polities);
     const events = [];
