@@ -4,6 +4,13 @@ import * as Cycling from '../lib/turchin_cycling';
 import { Text, Line, Group, Rect } from 'react-konva';
 import * as Styles from '../styles';
 
+const getStepPercentageByPolity = (step, polity) => {
+  const found_polity = step.percents.filter((per) => per.polity_id === polity.id)[0]
+  return !!found_polity 
+    ? found_polity.percent 
+    : 0
+}
+
 class ChartView extends React.Component {
   constructor(props) {
     super(props)
@@ -30,9 +37,11 @@ class ChartView extends React.Component {
     this.props.history.map((step, i) => {
       step.polities.map((polity, j) => {
         const all_previous_percents = j > 0
-          ? step.percents.slice(0, j).reduce((acc, curr) => acc + curr.percent, 0)
+          ? step.percents
+            .slice(0, j)
+            .reduce((acc, curr) => acc + curr.percent, 0)
           : 0
-        const percentage = step.percents.filter((per) => per.polity_id === polity.id)[0].percent
+        const percentage = getStepPercentageByPolity(step, polity)
         const x = ((this.props.width - this.state.offset_x) * (percentage + all_previous_percents))
         const y = i * this.state.step_distance
 
@@ -180,7 +189,7 @@ class ChartView extends React.Component {
                 const all_previous_percents = j > 0
                   ? step.percents.slice(0, j).reduce((acc, curr) => acc + curr.percent, 0)
                   : 0
-                const percentage = step.percents.filter((per) => per.polity_id === polity.id)[0].percent
+                const percentage = getStepPercentageByPolity(step, polity)
                 const x_end = ((this.props.width - this.state.offset_x) * (percentage + all_previous_percents))
                 const x_begin = ((this.props.width - this.state.offset_x) * (all_previous_percents))
                 const x = x_begin + ((x_end - x_begin - (this.state.event_text_width / 2)) / 2);

@@ -65,10 +65,11 @@ const NEIGHBOR_DISTANCE = GRID_SIZE
 
 export const run = async (polities, steps_to_run, step_interval = 0) => {
   for (let i = 0; i < steps_to_run; i++) {
-    // console.log(`%cTIME_STEP: ${i}`, "color: yellow; font-style: italic; background-color: blue;padding: 2px");
     polities
-    // .filter((polity) => polity.chief === null)
-    .map((polity) => makeDecision(polity, polities));
+    .map((polity) => {
+      if (polity.isPlayer) chooseDecision(polity, polities);
+      else makeDecision(polity, polities);
+    });
     await delay(step_interval);
   }
   
@@ -78,7 +79,7 @@ export const run = async (polities, steps_to_run, step_interval = 0) => {
 export const generatePolities = (amount) => {
   let polities = [];
   for (let i = 0; i < amount; i++) {
-    const color = colors.entity[i % colors.entity.length]
+    const color = getNextColor()
     polities.push(createPolity(color));
   }
   return polities;
@@ -87,7 +88,6 @@ export const generatePolities = (amount) => {
 const hasChiefDied = (polity, all_polities) => {
   const has_died = Math.random() <= (polity.chief_age / CHIEF_LIFE_EXPECTANCY) - 0.3
   if (has_died) {
-    // console.log(`DEATH: ${polity.name}'s Chief has died`)
     addEvent('DEATH', `${polity.name}'s Chief has died.`, [polity.id], all_polities)
   }
   return has_died;
@@ -106,7 +106,6 @@ const electChief = (polity, all_polities) => {
 const dismantlePolity = (polity, all_polities) => {
   const subordinates = getImmediateSubordinates(polity, all_polities)
   const amount_to_secede = getRandomIntInclusive(0, subordinates.length);
-  // console.log(`DISMANTLE: ${amount_to_secede} communities have decided to leave ${polity.name}.`)
   addEvent('DISMANTLE', `${amount_to_secede} communities have decided to leave ${polity.name}.`, [polity.id], all_polities)
   subordinates.map((s, i) => {
     if (i <= amount_to_secede - 1) {
@@ -124,7 +123,6 @@ const makeDecision = (polity, all_polities) => {
   } else {
     // consider allowing all polities that have subs, make this decision
     if (polity.chief === null) {
-      // console.log('DECISION: ', `The chief polity ${polity.name} deliberates`)
       addEvent('DECISION', `The chief polity ${polity.name} deliberates`, [polity.id], all_polities)
       let victim = findWeakestNeighborPolity(polity, all_polities)
       if (victim && willGoToWar(polity, victim, all_polities)) {
@@ -138,7 +136,6 @@ const makeDecision = (polity, all_polities) => {
   
       // rebelling polities rebel against paramount chief
       const chief_polity = getChiefPolity(polity, all_polities);
-      // console.log('DECISION: ', `${chief_polity.name}'s subordinate polity ${polity.name} deliberates`)
       addEvent('DECISION', `${chief_polity.name}'s subordinate polity ${polity.name} deliberates`, [polity.id], all_polities)
       if (willSecede(chief_polity, polity, all_polities)) {
         attemptRebellion(chief_polity, polity, all_polities);
@@ -148,6 +145,53 @@ const makeDecision = (polity, all_polities) => {
     }
   }
 
+  return polity;
+}
+
+const chooseDecision = (polity, all_polities) => {
+  upkeep(polity, all_polities);
+  if (hasChiefDied(polity, all_polities)) {
+    dismantlePolity(polity, all_polities);
+    electChief(polity, all_polities);
+  } else {
+    informPlayer(`YOU, the leader of ${polity.name} must make a decision.`);
+    if (polity.chief) {
+      // const chief_polity = getImmediateChief(polity, all_polities);
+      const chief_polity = getChiefPolity(polity, all_polities);
+      let choose_rebellion = promptPlayer(`We are paying tribute to ${chief_polity.name}. Will you lead us in rebellion, or seek fortune on their behalf?`);
+      addEvent('DECISION', `${chief_polity.name}'s subordinate polity ${polity.name} deliberates`, [polity.id], all_polities)
+      if (choose_rebellion) {
+        const should_rebel = willSecede(chief_polity, polity, all_polities);
+        const should_rebel_advice = should_rebel ? '' : 'NOT';
+        choose_rebellion = promptPlayer(`We do ${should_rebel_advice} think secession is a good idea. Will you continue with the plans for WAR?`)
+        if (choose_rebellion) {
+          attemptRebellion(chief_polity, polity, all_polities);
+          return polity;
+        }
+      }
+    }
+    const chooses_seek_war = promptPlayer(`Will you seek WAR or have peace?`);
+    addEvent('DECISION', `The chief polity ${polity.name} deliberates`, [polity.id], all_polities)
+    if (chooses_seek_war) {
+      let victim = findWeakestNeighborPolity(polity, all_polities)
+      if (victim) {
+        let chooses_war = promptPlayer(`Your neigbor, ${victim.name} is weak. Will you attack or have PEACE?`);
+        if (chooses_war) {
+          const should_war = willGoToWar(polity, victim, all_polities);
+          const should_war_advice = should_war ? '' : 'NOT';
+          chooses_war = promptPlayer(`We do ${should_war_advice} think we can win. Will you continue with the plans for WAR?`)
+          if (chooses_war) {
+            goToWar(polity, victim, null, all_polities);
+            return polity;
+          }
+        }
+      } else {
+        informPlayer(`There are no peoples to WAR with this year.`)
+      }
+    }
+  }
+
+  havePeace(polity, all_polities);
   return polity;
 }
 
@@ -238,7 +282,6 @@ const reorganizeInternalPolities = (chief, all_polities) => {
 }
 
 const annexTarget = (chief, target, all_polities) => {
-  // console.log('ANNEX: ', `${target.name} is annexed by ${chief.name}.`);
   // addEvent('ANNEX', `${target.name} is annexed by ${chief.name}.`, [chief.id, target.id], all_polities)
   const target_subordinate_ids = getImmediateSubordinates(target, all_polities).map((t) => t.id);
   all_polities.forEach(p => {
@@ -256,7 +299,6 @@ const secede = (polity, all_polities) => {
   const chief = getChiefPolity(polity, all_polities);
   all_polities.forEach(p => {
     if (p.id === polity.id) {
-      // console.log(`SECESSION: ${p.name} is seceded from ${chief.name}.`)
       addEvent('SECESSION', `${p.name} is seceded from ${chief.name}.`, [p.id, chief.id], all_polities)
       p.chief = null;
     } else if (p.id === chief.id) {
@@ -282,19 +324,16 @@ const willGoToWar = (polity, neighbor, all_polities) => {
 }
 
 const willSecede = (chief, subordinate, all_polities) => {
-  // console.log(subordinate);
   const probability_to_repel_attack = 1 - probabilityOfSuccessfulAttack(chief, subordinate, all_polities)
   return Math.random() <= probability_to_repel_attack;
 }
 
 const attemptRebellion = (chief, subordinate, all_polities) => {
-  // console.log('REBELLION: ', `${subordinate.name} attempts rebellion against ${chief.name}.`);
   addEvent('REBELLION', `${subordinate.name} attempts rebellion against ${chief.name}.`, [subordinate.id], all_polities);
   let probability_of_successful_attack = probabilityOfSuccessfulAttack(chief, subordinate, all_polities)
   let probability_to_repel_attack = 1 - probability_of_successful_attack
   const rebellion_succeeds = attackRepelled(probability_to_repel_attack)
   if (rebellion_succeeds) {
-    // console.log('REBELLION: ', `${subordinate.name} succeeds.`);
     addEvent('REBELLION', `${subordinate.name} succeeds in rebellion against ${chief.name}.`, [subordinate.id], all_polities);
     decreaseResourceBy(
       costOfUnsuccessfulAttack(probability_of_successful_attack),
@@ -308,7 +347,6 @@ const attemptRebellion = (chief, subordinate, all_polities) => {
     // reorganizeInternalPolities(chief, all_polities)
     reorganizeInternalPolities(getChiefPolity(chief), all_polities)
   } else {
-    // console.log('REBELLION: ', `${subordinate.name} fails.`);
     addEvent('REBELLION', `${subordinate.name} fails in rebellion against ${chief.name}.`, [subordinate.id], all_polities);
     decreaseResourceBy(
       costOfSuccessfulAttack(probability_of_successful_attack),
@@ -322,7 +360,6 @@ const attemptRebellion = (chief, subordinate, all_polities) => {
 }
 
 const havePeace = (polity, all_polities) => {
-  // console.log('PEACE: ', `${polity.name} has peace.`);
   addEvent('PEACE', `${polity.name} has peace.`, [polity.id], all_polities);
   increaseResourceBy(
     Math.sign(polity.baseline_resource_level - polity.resource_level) * (polity.baseline_resource_level / RESOURCE_RECOVERY_TIME),
@@ -334,10 +371,8 @@ const havePeace = (polity, all_polities) => {
 const goToWar = (attacker, defender, probability_to_repel_attack = null, all_polities) => {
   let target_community = findWealthiestBorderCommunity(attacker, defender, all_polities);
   if (!target_community) {
-    // console.log(`IMPASSE: ${defender.name} has no communities with reach of ${attacker.name}'s assualt.`);
     addEvent('IMPASSE', `${defender.name} has no communities with reach of ${attacker.name}'s assualt.`, [attacker.id], all_polities);
   } else {
-    // console.log('WAR: ', `${attacker.name} prepares for war against ${defender.name}`);
     addEvent('WAR', `${attacker.name} prepares for war against ${defender.name}`, [attacker.id], all_polities);
     
     let probability_of_successful_attack = probabilityOfSuccessfulAttack(attacker, target_community, all_polities)
@@ -346,7 +381,6 @@ const goToWar = (attacker, defender, probability_to_repel_attack = null, all_pol
     }
     const attack_succeeds = !attackRepelled(probability_to_repel_attack)
     if (attack_succeeds) {
-      // console.log('WAR: ', `${attacker.name} succeeds in battle against ${target_community.name}`);
       addEvent('WAR', `${attacker.name} succeeds in battle against ${target_community.name}`, [attacker.id], all_polities);
       decreaseResourceBy(
         costOfSuccessfulAttack(probability_of_successful_attack), 
@@ -362,12 +396,10 @@ const goToWar = (attacker, defender, probability_to_repel_attack = null, all_pol
       probability_to_repel_attack -= ((1 - LOSER_EFFECT) * probability_to_repel_attack)
       // if (defender.chief !== attacker.id) {
         if (getChiefPolity(defender, all_polities).id !== attacker.id) {
-        // console.log('WAR: ', `${attacker.name}'s onslaught continues against ${defender.name}`);
         addEvent('WAR', `${attacker.name}'s onslaught continues against ${defender.name}`, [attacker.id], all_polities);
         goToWar(attacker, defender, probability_to_repel_attack, all_polities)
       }
     } else {
-      // console.log('WAR: ', `${attacker.name} fails in battle against ${target_community.name}`);
       addEvent('WAR', `${attacker.name} fails in battle against ${target_community.name}`, [attacker.id], all_polities);
       decreaseResourceBy(
         costOfUnsuccessfulAttack(probability_of_successful_attack),
@@ -487,6 +519,14 @@ const addEvent = (type, message, ids, all_polities) => {
   });
 }
 
+const promptPlayer = (message, label_yes, label_no) => {
+  window.confirm(message)
+}
+
+const informPlayer = (message) => {
+  window.alert(message);
+}
+
 export const EVENT_TYPES = {
   DEFAULT: {
     color: 'gray',
@@ -556,11 +596,14 @@ export function createPolity(color) {
     has_incurred_war: false,
     chief_age: 30,
     events: [],
+    isPlayer: false,
     // color: Konva.Util.getRandomColor(),
     color,
   }
   return polity;
 }
+
+export const createPlayerPolity = (color) => { return {...createPolity(color), isPlayer: true} };
 
 const immuneToViolence = (polity) => polity.has_incurred_secession && polity.has_incurred_war;
 
@@ -601,7 +644,7 @@ const composeName = (namePartLists = []) => {
   return namePartLists.map((list) => getRandomInArray(list)).join(' ')
 }
 
-const colors = {
+const COLORS = {
   background: '#eadcbd',
   entity: [
     '#de6640',
@@ -612,4 +655,11 @@ const colors = {
     '#869f9b',
     '#cac9b4',
   ],
+}
+
+let CURRENT_COLOR_INDEX = 0
+const getNextColor = () => {
+  const color = COLORS.entity[CURRENT_COLOR_INDEX % COLORS.entity.length]
+  CURRENT_COLOR_INDEX += 1
+  return color
 }

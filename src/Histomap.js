@@ -13,6 +13,7 @@ class Histomap extends React.Component {
   constructor() {
     super();
     const polities = Cycling.generatePolities(10);
+    // polities.push(Cycling.createPlayerPolity('white'));
     const percents = Cycling.getPowerPercentages(polities);
     // const percents = Cycling.getPolityPercentages(polities);
     const events = [];
@@ -34,7 +35,7 @@ class Histomap extends React.Component {
       top_section_height,
       bottom_section_height,
       history: [{polities, percents, events}],
-      years_to_run: 10,
+      years_to_run: 1,
       running_sim: false,
       running_sim_reference: null,
       step_interval: 500,
@@ -83,7 +84,6 @@ class Histomap extends React.Component {
     const history = this.state.history.concat({polities, percents, events});
     
     await this.setState({ polities, history });
-    // console.table(polities);
 
     await delay(this.state.step_interval);
     if (this.state.running_sim) {
@@ -134,6 +134,23 @@ class Histomap extends React.Component {
     });
   }
 
+  addPolity (new_polity) {
+    const polities = this.state.polities.concat(new_polity)
+    const percents = Cycling.getPowerPercentages(polities);
+    const history = this.state.history.concat({ polities, percents, events: [] });
+    this.setState({polities, history})
+  }
+
+  addTurchinPolity () {
+    const new_polity = Cycling.generatePolities(1)[0]
+    this.addPolity(new_polity)
+  }
+
+  addPlayerPolity () {
+    const new_polity = Cycling.createPlayerPolity('white')
+    this.addPolity(new_polity)
+  }
+
   render() {
     return (
       <div>
@@ -154,6 +171,8 @@ class Histomap extends React.Component {
             onRestart={this.restart.bind(this)}
             onSwitchTheme={this.props.onSwitchTheme}
             onSwitchView={this.onSwitchView.bind(this)}
+            onAddTurchinPolity={this.addTurchinPolity.bind(this)}
+            onAddPlayerPolity={this.addPlayerPolity.bind(this)}
             chart_view={this.state.chart_view}
             stage_ref={this.stage_ref}
           />
@@ -166,7 +185,8 @@ class Histomap extends React.Component {
                   <ChartView
                     theme={this.props.theme}
                     polities={this.state.polities}
-                    all_historical_polities={this.state.all_historical_polities}
+                    all_historical_polities={this.state.polities}
+                    // all_historical_polities={this.state.all_historical_polities}
                     history={this.state.history}
                     years_to_run={this.state.years_to_run}
                     side_info_width={this.state.side_info_width}

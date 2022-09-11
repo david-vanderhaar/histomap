@@ -69,6 +69,26 @@ function Toolbar(props) {
         New History
       </button>
       <button
+        onClick={() => props.onAddTurchinPolity()}
+        className="btn"
+        style={{
+          backgroundColor: Styles.themes[props.theme].element_body,
+          color: Styles.themes[props.theme].element_text
+        }}
+      >
+        Add Polity
+      </button>
+      <button
+        onClick={() => props.onAddPlayerPolity()}
+        className="btn"
+        style={{
+          backgroundColor: Styles.themes[props.theme].element_body,
+          color: Styles.themes[props.theme].element_text
+        }}
+      >
+        Add Player
+      </button>
+      <button
         onClick={() => props.onSwitchTheme()}
         className="btn"
         style={{
