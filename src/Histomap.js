@@ -72,7 +72,8 @@ class Histomap extends React.Component {
   }
 
   async continuousStep (years_to_run = 1, step_interval = 0) {
-    let polities = await Cycling.run([...this.state.polities], years_to_run, step_interval);
+    const autoResolvePlayerDecisions = true
+    let polities = await Cycling.run([...this.state.polities], years_to_run, step_interval, autoResolvePlayerDecisions);
     // testing out when a polity is removed
     // let random_index = getRandomIntInclusive(0, polities.length);
     // polities = polities.filter((p, i) => i !== random_index)

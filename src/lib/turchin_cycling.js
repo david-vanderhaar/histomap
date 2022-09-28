@@ -63,11 +63,11 @@ const GRID_SIZE = 100
 const NEIGHBOR_DISTANCE = GRID_SIZE
 // const NEIGHBOR_DISTANCE = GRID_SIZE / 3
 
-export const run = async (polities, steps_to_run, step_interval = 0) => {
+export const run = async (polities, steps_to_run, step_interval = 0, autoResolvePlayerDecisions) => {
   for (let i = 0; i < steps_to_run; i++) {
     polities
     .map((polity) => {
-      if (polity.isPlayer) chooseDecision(polity, polities);
+      if (polity.isPlayer && !autoResolvePlayerDecisions) chooseDecision(polity, polities);
       else makeDecision(polity, polities);
     });
     await delay(step_interval);

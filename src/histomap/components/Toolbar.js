@@ -27,6 +27,10 @@ function Toolbar(props) {
       <button
         onClick={handleStartPause}
         className="btn"
+        title="
+          Start/Stop History
+          (player politiy decisions will be auto resolved)
+        "
         style={{
           backgroundColor: Styles.themes[props.theme].element_body,
           color: Styles.themes[props.theme].element_text
@@ -35,7 +39,7 @@ function Toolbar(props) {
         {
           props.running_sim
             ? 'Pause'
-            : 'Start'
+            : 'Auto'
         }
       </button>
       <button

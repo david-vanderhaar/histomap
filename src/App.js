@@ -16,7 +16,6 @@ const ref = React.createRef();
 
 function App() {
   const [theme, setTheme] = useState('light');
-
   return (
     <div ref={ref} className="App" style={{
       backgroundColor: Styles.themes[theme].background,
