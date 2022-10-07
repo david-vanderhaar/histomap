@@ -1,4 +1,4 @@
-import * as Helper from './helper';
+import * as Helper from '../../helper';
 
 // state CONQUERS territory
 // state CONFEDERATES with state (removes existing state)

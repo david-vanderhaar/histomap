@@ -1,6 +1,6 @@
 import React from 'react';
 import '../App.css';
-import * as Cycling from '../lib/turchin_cycling';
+import * as Cycling from '../lib/models/turchin_cycling/turchin_cycling';
 import { Rect, Text, Line, Group } from 'react-konva';
 
 class NodeView extends React.Component {

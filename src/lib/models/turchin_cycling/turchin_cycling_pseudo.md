@@ -1,5 +1,3 @@
-/*
-
 ----------------------
       VARIABLES
 ----------------------
@@ -62,8 +60,7 @@ For each chief polity
       secede()
     else
       havePeace()
-*/
-/*
+      
 ----------------------
       Functions
 ----------------------
@@ -146,4 +143,3 @@ const getPower = (polity) => {
   )
 }
 
-*/

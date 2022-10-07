@@ -1,6 +1,5 @@
 import React from 'react';
 import '../App.css';
-import * as Cycling from '../lib/turchin_cycling';
 import { Text, Line, Group, Rect } from 'react-konva';
 import * as Styles from '../styles';
 

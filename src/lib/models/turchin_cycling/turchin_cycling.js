@@ -1,7 +1,6 @@
-import { getRandomIntInclusive, getRandomInArray } from "./helper";
+import { getRandomIntInclusive, getRandomInArray } from "../../helper";
 import uuid from 'uuid/v1';
 import { delay } from "q";
-import Konva from 'konva';
 
 /*
 ----------------------

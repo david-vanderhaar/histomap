@@ -1,12 +1,12 @@
 import React from 'react';
-import './App.css';
-import * as Cycling from './lib/turchin_cycling';
-import NodeView from './histomap/NodeView';
-import ChartView from './histomap/ChartView';
-import Toolbar from './histomap/components/Toolbar';
-import Sidenav from './histomap/components/Sidenav';
+import '../App.css';
+import * as Cycling from '../lib/models/turchin_cycling/turchin_cycling';
+import NodeView from './NodeView';
+import ChartView from './ChartView';
+import Toolbar from './components/Toolbar';
+import Sidenav from './components/Sidenav';
 import { Stage, Layer, Rect, Text } from 'react-konva';
-import * as Styles from './styles';
+import * as Styles from '../styles';
 import { delay } from "q";
 
 class Histomap extends React.Component {
