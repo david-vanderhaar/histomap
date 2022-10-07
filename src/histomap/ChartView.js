@@ -1,6 +1,6 @@
 import React from 'react';
 import '../App.css';
-import { Text, Line, Group, Rect } from 'react-konva';
+import { Text, Line, Group } from 'react-konva';
 import * as Styles from '../styles';
 
 const getStepPercentageByPolity = (step, polity) => {

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import './App.css';
 import Histomap from './histomap/Histomap';
 import * as Styles from './styles';
-import Pdf from "react-to-pdf";
+// import Pdf from "react-to-pdf";
 
 const switchTheme = (theme) => {
   if (theme === 'light') {
