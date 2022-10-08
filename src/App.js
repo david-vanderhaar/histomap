@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import './App.css';
 import Histomap from './histomap/Histomap';
 import * as Styles from './styles';
+import LockAndKeyModel from './lib/models/lock_and_key/lock_and_key'
 // import Pdf from "react-to-pdf";
 
 const switchTheme = (theme) => {
@@ -16,6 +17,15 @@ const ref = React.createRef();
 
 function App() {
   const [theme, setTheme] = useState('light');
+
+  const actors = LockAndKeyModel.generateActors({})
+  console.log(actors);
+
+  const result = LockAndKeyModel.runFor(3, actors)
+  console.log(result);
+
+  console.log(LockAndKeyModel.getHistory());
+
   return (
     <div 
       ref={ref}

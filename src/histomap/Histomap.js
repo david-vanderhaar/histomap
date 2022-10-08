@@ -46,7 +46,7 @@ class Histomap extends React.Component {
 
   async componentDidMount () {
     // let polities = [...this.state.polities];
-    console.table(this.state.polities);
+    // console.table(this.state.polities);
     // polities = await Cycling.run(polities, 300, 0);
     // this.setState({polities});
     // // console.table(this.state.polities);

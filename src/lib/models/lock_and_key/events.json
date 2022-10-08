@@ -1,0 +1,66 @@
+[
+  {
+    "name": "MIGRATE",
+    "description": "The tribal people of ::ACTOR:: came upon the region known as ::RANDOM_PLACE::.",
+    "availableToLevels": [1, 2],
+    "effects": []
+  },
+  {
+    "name": "COLONIZE",
+    "description": "::ACTOR:: established colonies throughout ::RANDOM_PLACE::.}",
+    "availableToLevels": [4, 5],
+    "effects": [
+      {
+        "type": "changeStatBy",
+        "stat": "militaryPower",
+        "value": 1
+      },
+      {
+        "type": "changeStatBy",
+        "stat": "economicPower",
+        "value": 1
+      }
+    ]
+  },
+  {
+    "name": "ESTABLISH_CITY",
+    "description": "::ACTOR:: founded a city.",
+    "availableToLevels": [2, 3, 4, 5],
+    "effects": [
+      {
+        "type": "changeStatBy",
+        "stat": "economicPower",
+        "value": 1
+      },
+      {
+        "type": "changeStatBy",
+        "stat": "level",
+        "value": 1,
+        "conditions": [
+          {
+            "type": "statEquals",
+            "stat": "level",
+            "value": 2
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "REVOLT",
+    "description": "The people of ::ACTOR:: revolted against their leaders.",
+    "availableToLevels": [2, 3, 4, 5],
+    "effects": [
+      {
+        "type": "changeStatBy",
+        "stat": "militaryPower",
+        "value": -2
+      },
+      {
+        "type": "changeStatBy",
+        "stat": "economicPower",
+        "value": -2
+      }
+    ]
+  }
+]

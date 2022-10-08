@@ -1,20 +1,6 @@
-import uuid from 'uuid/v1';
-import * as Helper from '../helper';
+import * as Helper from '../helper'
 
-
-const TRAIT_MIN = 0;
-const TRAIT_MAX = 10;
-
-export function createEntity() {
-  let entity = {
-    id: uuid(),
-    name: composeName([namePrefixes, nameSuffixes]),
-    level: Helper.getRandomIntInclusive(1, 5),
-    militaryPower: Helper.getRandomIntInclusive(1, 5),
-    economicPower: Helper.getRandomIntInclusive(1, 5),
-  }
-  return entity;
-}
+export const generatePolityName = () => composeName([namePrefixes, nameSuffixes])
 
 const namePrefixes = [
   'Moon',
