@@ -3,6 +3,12 @@ import '../App.css';
 import * as Cycling from '../lib/models/turchin_cycling/turchin_cycling';
 import { Rect, Text, Line, Group } from 'react-konva';
 
+/* 
+NodeView requires that polities have:
+  - coordinates
+  - subordinates
+*/
+
 const NodeView = ({width, height, polities}) => {
   const offset_x = (width / 100) - 1
   const offset_y = (height / 100) - 1

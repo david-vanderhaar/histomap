@@ -65,40 +65,6 @@ class ChartView extends React.Component {
 
     return (
       <Group>
-        {/* <Group
-          draggable={true}
-          dragBoundFunc={
-            (pos) => {
-              return {
-                x: 0,
-                y: Math.min(0, pos.y)
-              }
-            }
-          }
-        >
-          {
-            this.props.polities.map((p, i) => {
-              return (
-                <Group key={i}>
-                  <Text
-                    x={20}
-                    y={100 + (i * 50)}
-                    text={p.name}
-                    fill={p.color}
-                    fontSize={20}
-                    />
-                  <Text
-                    x={20}
-                    y={120 + (i * 50)}
-                    text={Math.round(Cycling.getPower(p, this.props.polities) * 100) / 100}
-                    fill={p.color}
-                    fontSize={20}
-                  />
-                </Group>
-              )
-            })
-          }
-        </Group> */}
         <Group 
           x={chart_pos_x} 
           y={chart_pos_y}
