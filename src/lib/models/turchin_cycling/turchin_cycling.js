@@ -576,7 +576,7 @@ export const getPowerPercentages = (polities) => {
   const total_power = getTotalPower(polities, polities)
   return polities.map((p) => {
     let percent = (getPower(p, polities) / total_power)
-    return { percent, polity_id: p.id }
+    return { percent, polity_id: p.id, polity_name: p.name }
   })
 }
 

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import '../App.css';
 import * as Cycling from '../lib/models/turchin_cycling/turchin_cycling';
 import NodeView from './NodeView';
@@ -23,11 +23,24 @@ const Histomap = ({theme, onSwitchTheme, model}) => {
   const stage_ref = React.createRef();
 
   const [actors, setActors] = useState(model.generateActors(NUMBER_OF_ACTORS))
-  const relativePowerPercentages = model.getPowerPercentages(actors)
+  const [relativePowerPercentages, setRelativePowerPercentages] = useState(model.getPowerPercentages(actors))
 
   const start = () => null
   const pause = () => null
-  const step = () => null
+  const step = async () => {
+    const newActors = await model.run(actors, 10, 0, false)
+    setActors(newActors) 
+  
+    const newPercentages = model.getPowerPercentages(newActors)
+    setRelativePowerPercentages(newPercentages)
+  }
+
+  useEffect(() => {
+    step()
+    delay(1000)
+    step()
+    delay(1000)
+  }, [])
   const reset = () => null
   const restart = () => null
   const onSwitchView = () => null
@@ -59,7 +72,7 @@ const Histomap = ({theme, onSwitchTheme, model}) => {
       </div>
       <div className='Stage' style={{ paddingTop: STAGE_PADDING_TOP }}>
         {
-          actors.map((actor) => (<div>{actor.name}</div>))
+          relativePowerPercentages.map((percent) => (<div>{percent.polity_name}: {percent.percent * 100}</div>))
         }
       </div>
       <Footer theme={theme}/>
