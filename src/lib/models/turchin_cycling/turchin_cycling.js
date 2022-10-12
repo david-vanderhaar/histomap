@@ -84,6 +84,8 @@ export const generatePolities = (amount) => {
   return polities;
 }
 
+export const generateActors = generatePolities
+
 const hasChiefDied = (polity, all_polities) => {
   const has_died = Math.random() <= (polity.chief_age / CHIEF_LIFE_EXPECTANCY) - 0.3
   if (has_died) {
