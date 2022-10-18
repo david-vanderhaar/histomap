@@ -4,7 +4,6 @@ import * as Cycling from '../lib/models/turchin_cycling/turchin_cycling';
 import NodeView from './NodeView';
 import ChartView from './ChartView';
 import Toolbar from './components/Toolbar';
-import Sidenav from './components/Sidenav';
 import { Stage, Layer, Rect, Text } from 'react-konva';
 import * as Styles from '../styles';
 import { delay } from "q";
@@ -26,7 +25,6 @@ const Histomap = ({theme, onSwitchTheme, model}) => {
   const years_to_run = 1
 
   const [actors, setActors] = useState(model.generateActors(NUMBER_OF_ACTORS))
-  const [relativePowerPercentages, setRelativePowerPercentages] = useState(model.getPowerPercentages(actors))
 
   const start = () => null
   const pause = () => null
@@ -34,9 +32,6 @@ const Histomap = ({theme, onSwitchTheme, model}) => {
     const newActors = await model.run(actors, 10, 0, false)
     setActors(newActors) 
   
-    const newPercentages = model.getPowerPercentages(newActors)
-    setRelativePowerPercentages(newPercentages)
-
     const newHistory = model.getHistory({actors: newActors, currentHistory: history})
     setHistory(newHistory)
   }
@@ -49,7 +44,6 @@ const Histomap = ({theme, onSwitchTheme, model}) => {
 
   return (
     <div>
-      <Sidenav theme={theme} />
       <div className='top-section' style={{height: TOP_SECTION_HEIGHT}}>
         <Title theme={theme} title="The HISTOMAP" />
         <StepCounter theme={theme} step_label="year" total_steps={history.length}/>
@@ -71,7 +65,6 @@ const Histomap = ({theme, onSwitchTheme, model}) => {
           />
       </div>
       <div className='Stage' style={{ paddingTop: STAGE_PADDING_TOP }}>
-        <PowerPercentages relativePowerPercentages={relativePowerPercentages} />
         <Stage ref={stage_ref} width={STAGE_WIDTH} height={STAGE_HEIGHT}>
           <Layer>
             {

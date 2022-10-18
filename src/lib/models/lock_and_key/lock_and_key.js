@@ -44,7 +44,7 @@ const runFor = (times, actors) => {
   return newActors
 }
 
-const generateActors = ({ amountToCreate = 3 }) => {
+const generateActors = (amountToCreate = 3) => {
   return Array(amountToCreate)
     .fill()
     .map(() => createActor())
