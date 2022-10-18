@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import '../App.css';
 import Models from '../lib/models/models'
 import NodeView from './NodeView';
@@ -16,31 +16,47 @@ const STAGE_PADDING_TOP = 20;
 const NUMBER_OF_ACTORS = 10
 const STAGE_WIDTH = window.innerWidth - CHART_PADDING
 const STAGE_HEIGHT = window.innerHeight - (TOP_SECTION_HEIGHT + BOTTOM_SECTION_HEIGHT + STAGE_PADDING_TOP)
-const DEFAULT_MODEL = 'SIMPLE'
+const DEFAULT_MODEL = 'TURCHIN_CYCLING'
+// const DEFAULT_MODEL = 'SIMPLE'
+const STEP_DELAY = 500
 
 const Histomap = ({theme, onSwitchTheme}) => {
   const [modelData, setModelData] = useState(Models[DEFAULT_MODEL])
   const [actors, setActors] = useState(modelData.model.generateActors(NUMBER_OF_ACTORS))
-
-  const [history, setHistory] = useState([])
-  const running_sim = false
+  const [history, setHistory] = useState(modelData.model.getHistory({ actors, currentHistory: [] }))
+  const [running_sim, setRunningSim] = useState(false)
   const [chart_view, setChartView] = useState(true)
   const stage_ref = React.createRef();
   const years_to_run = 1
+  const [stepIntervalInstance, setStepIntervalInstance] = useState(null)
 
   let getModel = () => modelData.model
   useEffect(() => {
     getModel = () => modelData.model
   }, [modelData])
 
-  const start = () => null
-  const pause = () => null
-  const step = async () => {
-    const newActors = await getModel().run(actors, 10, 0, false)
-    setActors(newActors)
+  const start = () => {
+    setRunningSim(true)
+    const interval = setInterval(step, STEP_DELAY)
+    setStepIntervalInstance(interval)
+  }
 
-    const newHistory = getModel().getHistory({ actors: newActors, currentHistory: history })
-    setHistory(newHistory)
+  const pause = () => {
+    setRunningSim(false)
+    clearInterval(stepIntervalInstance)
+  }
+
+  const step = () => {
+    let newActors = null
+    setActors((prev) => {
+      newActors = getModel().run(prev, 10, false)
+      return newActors
+    })
+
+    setHistory((prev) => {
+      const newHistory = getModel().getHistory({ actors: newActors, currentHistory: prev })
+      return newHistory
+    })
   }
 
   const reset = () => null
@@ -51,9 +67,11 @@ const Histomap = ({theme, onSwitchTheme}) => {
   const onSelectModel = (event) => {
     const key = event.target.value
     const newModelData = Models[key]
+    const newActors = newModelData.model.generateActors(NUMBER_OF_ACTORS)
+    const newHsitory = newModelData.model.getHistory({ actors: newActors, currentHistory: [] })
     setModelData(newModelData)
-    setActors(newModelData.model.generateActors(NUMBER_OF_ACTORS))
-    setHistory([])
+    setActors(newActors)
+    setHistory(newHsitory)
   }
 
   return (

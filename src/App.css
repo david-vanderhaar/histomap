@@ -28,6 +28,8 @@ body {
 
 select {
   border-radius: 2px;
+  vertical-align: middle;
+  text-transform: uppercase;
 }
 
 .bottom-section {

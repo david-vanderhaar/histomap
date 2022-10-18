@@ -1,6 +1,5 @@
 import { getRandomIntInclusive, getRandomInArray } from "../../helper";
 import uuid from 'uuid/v1';
-import { delay } from "q";
 
 /*
 ----------------------
@@ -62,14 +61,13 @@ const GRID_SIZE = 100
 const NEIGHBOR_DISTANCE = GRID_SIZE
 // const NEIGHBOR_DISTANCE = GRID_SIZE / 3
 
-export const run = async (polities, steps_to_run, step_interval = 0, autoResolvePlayerDecisions) => {
+export const run = (polities, steps_to_run, autoResolvePlayerDecisions) => {
   for (let i = 0; i < steps_to_run; i++) {
     polities
     .map((polity) => {
       if (polity.isPlayer && !autoResolvePlayerDecisions) chooseDecision(polity, polities);
       else makeDecision(polity, polities);
     });
-    await delay(step_interval);
   }
   
   return polities;  
@@ -465,6 +463,7 @@ export const getPower = (polity, all_polities) => {
 }
 
 export const getTotalPower = (polities, all_polities) => {
+  console.log(polities);
   return polities.reduce(
     (acc, curr) => {
       return acc + getPower(curr, all_polities)

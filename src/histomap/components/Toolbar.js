@@ -14,7 +14,7 @@ const ModelSelect = ({selected, onSelect, theme}) => {
           color: Styles.themes[theme].element_text
         }
       }
-      onClick={onSelect}
+      onChange={onSelect}
       defaultValue={selected}
     >
       {Object.entries(Models).map(([key, value]) => {

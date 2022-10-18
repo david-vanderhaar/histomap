@@ -109,7 +109,7 @@ class ChartView extends React.Component {
           {
             this.props.history.map((step, i) => {
               return (
-                <Group>
+                <Group key={i}>
                   <Text
                     x={(this.props.side_info_width - this.state.offset_x)}
                     y={(i * this.state.step_distance) - 25}
