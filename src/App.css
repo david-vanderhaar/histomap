@@ -20,8 +20,14 @@ body {
   font-size: 20px;
 }
 
-.Toolbar .btn {
+.Toolbar .btn,
+.Toolbar select {
   margin-right: 8px;
+  height: 36px;
+}
+
+select {
+  border-radius: 2px;
 }
 
 .bottom-section {

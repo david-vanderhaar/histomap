@@ -1,9 +1,34 @@
 import React from 'react';
 import '../../App.css';
 import * as Styles from '../../styles';
+import Models from '../../lib/models/models'
+
+const ModelSelect = ({selected, onSelect, theme}) => {
+  return (
+    <select
+      style={
+        {
+          display: 'inline-block',
+          width: 'initial',
+          backgroundColor: Styles.themes[theme].element_body,
+          color: Styles.themes[theme].element_text
+        }
+      }
+      onClick={onSelect}
+      defaultValue={selected}
+    >
+      {Object.entries(Models).map(([key, value]) => {
+        return (
+          <option key={key} value={key}>
+            {value.name}
+          </option>
+        )
+      })}
+    </select>
+  )
+}
 
 function Toolbar(props) {
-
   const handleStartPause = () => {
     if (props.running_sim) {
       props.onPause()
@@ -24,6 +49,7 @@ function Toolbar(props) {
 
   return (
     <div className="Toolbar">
+      <ModelSelect theme={props.theme} onSelect={props.onSelectModel} selected={props.selectedModelName}/>
       <button
         onClick={handleStartPause}
         className="btn"

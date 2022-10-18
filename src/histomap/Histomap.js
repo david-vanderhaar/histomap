@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import '../App.css';
-import * as Cycling from '../lib/models/turchin_cycling/turchin_cycling';
+import Models from '../lib/models/models'
 import NodeView from './NodeView';
 import ChartView from './ChartView';
 import Toolbar from './components/Toolbar';
@@ -8,7 +8,7 @@ import { Stage, Layer, Rect, Text } from 'react-konva';
 import * as Styles from '../styles';
 import { delay } from "q";
 
-const TOP_SECTION_HEIGHT = 200;
+const TOP_SECTION_HEIGHT = 220;
 const BOTTOM_SECTION_HEIGHT = 60;
 const CHART_PADDING = 180;
 const SIDE_INFO_WIDTH = 80;
@@ -16,23 +16,30 @@ const STAGE_PADDING_TOP = 20;
 const NUMBER_OF_ACTORS = 10
 const STAGE_WIDTH = window.innerWidth - CHART_PADDING
 const STAGE_HEIGHT = window.innerHeight - (TOP_SECTION_HEIGHT + BOTTOM_SECTION_HEIGHT + STAGE_PADDING_TOP)
+const DEFAULT_MODEL = 'SIMPLE'
 
-const Histomap = ({theme, onSwitchTheme, model}) => {
+const Histomap = ({theme, onSwitchTheme}) => {
+  const [modelData, setModelData] = useState(Models[DEFAULT_MODEL])
+  const [actors, setActors] = useState(modelData.model.generateActors(NUMBER_OF_ACTORS))
+
   const [history, setHistory] = useState([])
   const running_sim = false
   const [chart_view, setChartView] = useState(true)
   const stage_ref = React.createRef();
   const years_to_run = 1
 
-  const [actors, setActors] = useState(model.generateActors(NUMBER_OF_ACTORS))
+  let getModel = () => modelData.model
+  useEffect(() => {
+    getModel = () => modelData.model
+  }, [modelData])
 
   const start = () => null
   const pause = () => null
   const step = async () => {
-    const newActors = await model.run(actors, 10, 0, false)
-    setActors(newActors) 
-  
-    const newHistory = model.getHistory({actors: newActors, currentHistory: history})
+    const newActors = await getModel().run(actors, 10, 0, false)
+    setActors(newActors)
+
+    const newHistory = getModel().getHistory({ actors: newActors, currentHistory: history })
     setHistory(newHistory)
   }
 
@@ -41,6 +48,13 @@ const Histomap = ({theme, onSwitchTheme, model}) => {
   const onSwitchView = () => setChartView(!chart_view)
   const addPolity = () => null
   const addPlayerPolity = () => null
+  const onSelectModel = (event) => {
+    const key = event.target.value
+    const newModelData = Models[key]
+    setModelData(newModelData)
+    setActors(newModelData.model.generateActors(NUMBER_OF_ACTORS))
+    setHistory([])
+  }
 
   return (
     <div>
@@ -49,19 +63,21 @@ const Histomap = ({theme, onSwitchTheme, model}) => {
         <StepCounter theme={theme} step_label="year" total_steps={history.length}/>
         <SubTitle theme={theme} title="Relative power of contemporary states, nations, and empires" />
         <Toolbar 
-            theme={theme}
-            running_sim={running_sim}
-            onStart={start}
-            onPause={pause}
-            onStep={step}
-            onReset={reset}
-            onRestart={restart}
-            onSwitchTheme={onSwitchTheme}
-            onSwitchView={onSwitchView}
-            onAddTurchinPolity={addPolity}
-            onAddPlayerPolity={addPlayerPolity}
-            chart_view={chart_view}
-            stage_ref={stage_ref}
+          theme={theme}
+          running_sim={running_sim}
+          onStart={start}
+          onPause={pause}
+          onStep={step}
+          onReset={reset}
+          onRestart={restart}
+          onSwitchTheme={onSwitchTheme}
+          onSwitchView={onSwitchView}
+          onAddTurchinPolity={addPolity}
+          onAddPlayerPolity={addPlayerPolity}
+          onSelectModel={onSelectModel}
+          selectedModelName={DEFAULT_MODEL}
+          chart_view={chart_view}
+          stage_ref={stage_ref}
           />
       </div>
       <div className='Stage' style={{ paddingTop: STAGE_PADDING_TOP }}>

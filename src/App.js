@@ -2,8 +2,7 @@ import React, { useState } from 'react';
 import './App.css';
 import Histomap from './histomap/Histomap';
 import * as Styles from './styles';
-import LockAndKeyModel from './lib/models/lock_and_key/lock_and_key'
-import * as CyclingModel from './lib/models/turchin_cycling/turchin_cycling'
+import Models from './lib/models/models';
 
 const switchTheme = (theme) => {
   if (theme === 'light') {
@@ -17,14 +16,11 @@ const ref = React.createRef();
 
 function App() {
   const [theme, setTheme] = useState('light');
-
-  // const actors = LockAndKeyModel.generateActors({})
-  // console.log(actors);
-
-  // const result = LockAndKeyModel.runFor(3, actors)
-  // console.log(result);
-
-  // console.log(LockAndKeyModel.getHistory());
+  const [modelData, setModelData] = useState(Models.TURCHIN_CYCLING)
+  const onSelectModel = (event) => {
+    const key = event.target.value
+    setModelData(Models[key])
+  }
 
   return (
     <div 
@@ -35,8 +31,8 @@ function App() {
       <Histomap 
         onSwitchTheme={() => { setTheme(switchTheme(theme))}} 
         theme={theme}
-        model={LockAndKeyModel}
-        // model={CyclingModel}
+        modelData={modelData}
+        onSelectModel={onSelectModel}
       />
     </div>
   );
