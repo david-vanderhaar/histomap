@@ -1,6 +1,5 @@
 import * as GeneratorHelper from './helper'
-
-export const generatePolityName = () => GeneratorHelper.composeName([namePrefixes, nameSuffixes])
+export const generatePlaceName = () => GeneratorHelper.composeName([namePrefixes, nameSuffixes])
 
 const namePrefixes = [
   'Moon',

@@ -7,7 +7,7 @@
   },
   {
     "name": "COLONIZE",
-    "description": "::ACTOR:: established colonies throughout ::RANDOM_PLACE::.}",
+    "description": "::ACTOR:: established colonies throughout ::RANDOM_PLACE::.",
     "availableToLevels": [4, 5],
     "effects": [
       {

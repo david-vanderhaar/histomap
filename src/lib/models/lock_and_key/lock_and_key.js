@@ -1,5 +1,5 @@
 import { createActor } from './actor'
-import { pickEventForActor } from './event'
+import { pickEventForActor, createEventDescription } from './event'
 
 const logger = () => {
   const events = []
@@ -24,7 +24,8 @@ const run = (actors, time = 0) => {
   const newActors = actors.map((actor) => {
     const event = pickEventForActor(actor)
     const newActor = event.happenTo(actor)
-    newActor.addEvent({event: event.name, time})
+    const description = createEventDescription(event.description, actor)
+    newActor.addEvent({event_type: event.name, description, time})
     return newActor
   })
 
@@ -49,9 +50,42 @@ const generateActors = ({ amountToCreate = 3 }) => {
     .map(() => createActor())
 }
 
+const getPowerPercentages = (actors) => {
+  const total_power = getTotalPower(actors)
+  return actors.map((actor) => {
+    const percent = getRelativeActorPower(actor, total_power)
+    return { percent, polity_id: actor.id, polity_name: actor.name }
+  })
+}
+
+const getRelativeActorPower = (actor, total_power) => getActorPower(actor) / total_power
+const getTotalPower = (actors) => actors.reduce((acc, curr) => acc + getActorPower(curr), 0)
+const getActorPower = (actor) => (actor.economicPower + actor.militaryPower) * actor.level
+
+const getHistory = ({actors, currentHistory}) => {
+  const percents = getPowerPercentages(actors);
+  const events = getEvents(actors);
+  const history = currentHistory.concat({polities: actors, percents, events});
+
+  return history
+}
+
+const getEvents = (actors) => {
+  return actors.map((actor) => {
+    const events = actor.events.map(
+      (event) => ({
+        event: {color: 'red'},
+        message: event.description
+      })
+    )
+    return {events, polity_id: actor.id}
+  })
+}
+
 export default {
   run,
   runFor,
   generateActors,
-  getHistory: () => HISTORY_LOG.events
+  getHistory,
+  getPowerPercentages,
 }

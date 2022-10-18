@@ -11,16 +11,19 @@ import { delay } from "q";
 
 const TOP_SECTION_HEIGHT = 200;
 const BOTTOM_SECTION_HEIGHT = 60;
-const chart_padding = 180;
-const side_info_width = 80;
+const CHART_PADDING = 180;
+const SIDE_INFO_WIDTH = 80;
 const STAGE_PADDING_TOP = 20;
 const NUMBER_OF_ACTORS = 10
+const STAGE_WIDTH = window.innerWidth - CHART_PADDING
+const STAGE_HEIGHT = window.innerHeight - (TOP_SECTION_HEIGHT + BOTTOM_SECTION_HEIGHT + STAGE_PADDING_TOP)
 
 const Histomap = ({theme, onSwitchTheme, model}) => {
-  const history = []
+  const [history, setHistory] = useState([])
   const running_sim = false
-  const chart_view = true
+  const [chart_view, setChartView] = useState(true)
   const stage_ref = React.createRef();
+  const years_to_run = 1
 
   const [actors, setActors] = useState(model.generateActors(NUMBER_OF_ACTORS))
   const [relativePowerPercentages, setRelativePowerPercentages] = useState(model.getPowerPercentages(actors))
@@ -33,17 +36,14 @@ const Histomap = ({theme, onSwitchTheme, model}) => {
   
     const newPercentages = model.getPowerPercentages(newActors)
     setRelativePowerPercentages(newPercentages)
+
+    const newHistory = model.getHistory({actors: newActors, currentHistory: history})
+    setHistory(newHistory)
   }
 
-  useEffect(() => {
-    step()
-    delay(1000)
-    step()
-    delay(1000)
-  }, [])
   const reset = () => null
   const restart = () => null
-  const onSwitchView = () => null
+  const onSwitchView = () => setChartView(!chart_view)
   const addPolity = () => null
   const addPlayerPolity = () => null
 
@@ -71,14 +71,45 @@ const Histomap = ({theme, onSwitchTheme, model}) => {
           />
       </div>
       <div className='Stage' style={{ paddingTop: STAGE_PADDING_TOP }}>
-        {
-          relativePowerPercentages.map((percent) => (<div>{percent.polity_name}: {percent.percent * 100}</div>))
-        }
+        <PowerPercentages relativePowerPercentages={relativePowerPercentages} />
+        <Stage ref={stage_ref} width={STAGE_WIDTH} height={STAGE_HEIGHT}>
+          <Layer>
+            {
+              chart_view && (
+                <ChartView
+                  theme={theme}
+                  polities={actors}
+                  all_historical_polities={actors}
+                  history={history}
+                  years_to_run={years_to_run}
+                  side_info_width={SIDE_INFO_WIDTH}
+                  width={STAGE_WIDTH - SIDE_INFO_WIDTH}
+                  height={STAGE_HEIGHT - STAGE_PADDING_TOP}
+                  offset_x={CHART_PADDING}
+                  offset_y={85}
+                />
+              )
+            }
+            {
+              !chart_view && (
+                <NodeView
+                  polities={actors}
+                  width={STAGE_WIDTH}
+                  height={STAGE_HEIGHT}
+                />
+              )
+            }
+            
+          </Layer>
+        </Stage>
       </div>
       <Footer theme={theme}/>
     </div>
   )
 }
+
+const PowerPercentages = ({relativePowerPercentages}) => 
+  relativePowerPercentages.map((percent, i) => (<div key={`${i}-power-percentage`}>{percent.polity_name}: {Math.round(percent.percent * 100)}</div>))
 
 const Title = ({theme, title}) => (<h1 style={{color: Styles.themes[theme].element_body, margin: 0}}>{title}</h1>)
 const StepCounter = ({theme, step_label, total_steps}) => (

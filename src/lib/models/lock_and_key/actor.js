@@ -1,3 +1,4 @@
+import Konva from 'konva';
 import uuid from 'uuid/v1';
 import * as Helper from '../../helper';
 import { generatePolityName } from '../../generators/names';
@@ -10,7 +11,7 @@ export const createActor = () => {
   const description = mapLevelToDescription(level)
   const events = []
 
-  const addEvent = ({event, time}) => events.push({event, time})
+  const addEvent = (event) => events.push(event)
 
   return {
     id: uuid(),
@@ -21,6 +22,7 @@ export const createActor = () => {
     economicPower: Helper.getRandomIntInclusive(1, 5),
     events,
     addEvent,
+    color: getNextColor()
   }
 }
 
@@ -32,4 +34,24 @@ const levelDescriptions = {
   3: 'city-state',
   4: 'kingdom (several cities)',
   5: 'Empire (several kingdoms)',
+}
+
+const COLORS = {
+  background: '#eadcbd',
+  entity: [
+    '#de6640',
+    '#e39d96',
+    '#e8c4ac',
+    '#ebd66b',
+    '#638c5f',
+    '#869f9b',
+    '#cac9b4',
+  ],
+}
+
+let CURRENT_COLOR_INDEX = 0
+const getNextColor = () => {
+  const color = COLORS.entity[CURRENT_COLOR_INDEX % COLORS.entity.length]
+  CURRENT_COLOR_INDEX += 1
+  return color
 }

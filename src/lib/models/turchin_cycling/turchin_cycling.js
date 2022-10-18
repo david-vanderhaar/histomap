@@ -580,6 +580,14 @@ export const getPowerPercentages = (polities) => {
   })
 }
 
+export const getHistory = ({actors, currentHistory}) => {
+  const percents = getPowerPercentages(actors);
+  const events = getEvents(actors);
+  const history = currentHistory.concat({polities: actors, percents, events});
+
+  return history
+}
+
 export function createPolity(color) {
   const baseline_resource_level = 1 + (getRandomIntInclusive(-1, 1) * RESOURCE_BASELINE_DEVIATION)
 
@@ -598,7 +606,6 @@ export function createPolity(color) {
     chief_age: 30,
     events: [],
     isPlayer: false,
-    // color: Konva.Util.getRandomColor(),
     color,
   }
   return polity;

@@ -1,3 +1,4 @@
+import { generatePlaceName } from '../../generators/place_names';
 import * as Helper from '../../helper';
 import eventJson from './events.json'
 
@@ -20,7 +21,7 @@ import eventJson from './events.json'
   // traits
   // history (array of events)
 
-const createChangeStatByEffect = (stat) => (changeBy) => (actor) => actor[stat] += changeBy
+const createChangeStatByEffect = (stat) => (changeBy) => (actor) => actor[stat] = Math.max(0.1, actor[stat] + changeBy)
 const ifStatEquals = (stat) => (value) => (actor) => actor[stat] === value
 
 const effectTypes = {
@@ -69,6 +70,9 @@ const createEvent = ({
     happenTo: (actor) => processEffects(effects, actor)
   })
 }
+
+export const createEventDescription = (description, actor) => 
+  description.replace('::ACTOR::', actor.name).replace('::RANDOM_PLACE::', generatePlaceName())
 
 export const events = eventJson.map((event) => createEvent(event))
 
