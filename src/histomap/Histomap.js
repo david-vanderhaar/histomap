@@ -13,7 +13,7 @@ const BOTTOM_SECTION_HEIGHT = 60;
 const CHART_PADDING = 180;
 const SIDE_INFO_WIDTH = 80;
 const STAGE_PADDING_TOP = 20;
-const NUMBER_OF_ACTORS = 10
+const NUMBER_OF_ACTORS = 30
 const STAGE_WIDTH = window.innerWidth - CHART_PADDING
 const STAGE_HEIGHT = window.innerHeight - (TOP_SECTION_HEIGHT + BOTTOM_SECTION_HEIGHT + STAGE_PADDING_TOP)
 const DEFAULT_MODEL = 'TURCHIN_CYCLING'
@@ -23,6 +23,7 @@ const STEP_DELAY = 500
 const Histomap = ({theme, onSwitchTheme}) => {
   const [modelData, setModelData] = useState(Models[DEFAULT_MODEL])
   const [actors, setActors] = useState(modelData.model.generateActors(NUMBER_OF_ACTORS))
+  const originalActors = [...actors]
   const [history, setHistory] = useState(modelData.model.getHistory({ actors, currentHistory: [] }))
   const [running_sim, setRunningSim] = useState(false)
   const [chart_view, setChartView] = useState(true)
@@ -59,17 +60,31 @@ const Histomap = ({theme, onSwitchTheme}) => {
     })
   }
 
-  const reset = () => null
-  const restart = () => null
+  const reset = () => {
+    const newActors = getModel().generateActors(NUMBER_OF_ACTORS)
+    const newHistory = getModel().getHistory({ actors: newActors, currentHistory: [] })
+    setActors(newActors)
+    setHistory(newHistory)
+  }
+
+  const restart = () => {
+    const newHistory = getModel().getHistory({ actors: originalActors, currentHistory: [] })
+    setActors(originalActors)
+    setHistory(newHistory)
+  }
+
   const onSwitchView = () => setChartView(!chart_view)
+
   const addPolity = () => null
+
   const addPlayerPolity = () => null
+
   const onSelectModel = (event) => {
     const key = event.target.value
     const newModelData = Models[key]
+    setModelData(newModelData)
     const newActors = newModelData.model.generateActors(NUMBER_OF_ACTORS)
     const newHsitory = newModelData.model.getHistory({ actors: newActors, currentHistory: [] })
-    setModelData(newModelData)
     setActors(newActors)
     setHistory(newHsitory)
   }

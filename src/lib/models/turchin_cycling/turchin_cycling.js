@@ -463,7 +463,6 @@ export const getPower = (polity, all_polities) => {
 }
 
 export const getTotalPower = (polities, all_polities) => {
-  console.log(polities);
   return polities.reduce(
     (acc, curr) => {
       return acc + getPower(curr, all_polities)

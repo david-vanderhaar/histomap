@@ -99,6 +99,7 @@ function Toolbar(props) {
         New History
       </button>
       <button
+        disabled
         onClick={() => props.onAddTurchinPolity()}
         className="btn"
         style={{
@@ -109,6 +110,7 @@ function Toolbar(props) {
         Add Polity
       </button>
       <button
+        disabled
         onClick={() => props.onAddPlayerPolity()}
         className="btn"
         style={{
@@ -133,6 +135,7 @@ function Toolbar(props) {
         }
       </button>
       <button
+        disabled
         onClick={() => props.onSwitchView()}
         className="btn"
         style={{
