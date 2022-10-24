@@ -1,6 +1,7 @@
 import { generatePlaceName } from '../../generators/place_names';
 import * as Helper from '../../helper';
-import eventJson from './events.json'
+// import eventJson from './events.json'
+import eventJson from './events.js'
 
 // state CONQUERS territory
 // state CONFEDERATES with state (removes existing state)
@@ -22,18 +23,24 @@ import eventJson from './events.json'
   // history (array of events)
 
 const createChangeStatByEffect = (stat) => (changeBy) => (actor) => actor[stat] = Math.max(0.1, actor[stat] + changeBy)
+const createChangeStatByRandomRangeEffect = (stat) => ([min, max]) => (actor) => createChangeStatByEffect(stat)(Helper.getRandomIntInclusive(min, max))(actor)
+const createRandomizeStatBetweenEffect = (stat) => ([min, max]) => (actor) => actor[stat] = Helper.getRandomIntInclusive(min, max)
 const ifStatEquals = (stat) => (value) => (actor) => actor[stat] === value
+const ifStatIsBetween = (stat) => ([min, max]) => (actor) => actor[stat] >= min && actor[stat] <= max
 
 const effectTypes = {
-  changeStatBy: ({stat, value}) => createChangeStatByEffect(stat)(value)
+  changeStatBy: ({stat, value}) => createChangeStatByEffect(stat)(value),
+  changeStatByRandomRange: ({stat, value}) => createChangeStatByRandomRangeEffect(stat)(value),
+  randomizeStatBetween: ({stat, value}) => createRandomizeStatBetweenEffect(stat)(value),
 }
 
-const effectCondtionTypes = {
-  statEquals: ({stat, value}) => ifStatEquals(stat)(value)
+const condtionTypes = {
+  statEquals: ({stat, value}) => ifStatEquals(stat)(value),
+  statBetween: ({stat, value}) => ifStatIsBetween(stat)(value),
 }
 
 const createEffect = ({type, ...data}) => effectTypes[type](data)
-const createEffectCondition = ({type, ...data}) => effectCondtionTypes[type](data)
+const createCondition = ({type, ...data}) => condtionTypes[type](data)
 const allConditionsTrue = (conditions) => conditions.every(Boolean)
 
 const processEffects = (effects, actor) => {
@@ -42,7 +49,7 @@ const processEffects = (effects, actor) => {
   effects.forEach((effect) => {
     const conditions = effect?.conditions || []
     const conditionResults = conditions
-      .map((condition) => createEffectCondition(condition)(actor))
+      .map((condition) => createCondition(condition)(actor))
 
     if (allConditionsTrue(conditionResults)) createEffect(effect)(newActor)
   })
@@ -52,21 +59,21 @@ const processEffects = (effects, actor) => {
 
 const createEvent = ({
   name,
-  availableToLevels = [], // empty means it's available to all
   gainedTraits = [],
   lostTraits = [],
   effects = [],
   description = 'event happened',
   weight = 1, // chance that this will be picked (based on level, traits and stats)
+  conditions = [],
 }) => {
   return ({
     name,
-    availableToLevels,
     gainedTraits,
     lostTraits,
     effects,
     description,
     weight,
+    conditions,
     happenTo: (actor) => processEffects(effects, actor)
   })
 }
@@ -78,4 +85,23 @@ export const events = eventJson.map((event) => createEvent(event))
 
 const filterByActorLevel = (actor) => (event) => event.availableToLevels.includes(actor.level)
 
-export const pickEventForActor = (actor) => Helper.getRandomInArray(events.filter(filterByActorLevel(actor)))
+// export const pickEventForActor = (actor) => Helper.getRandomInArray(events.filter(filterByActorLevel(actor)))
+const getAvailableEventsV1 = (actor) => events.filter(filterByActorLevel(actor))
+
+const getConditionResults = (actor, conditions) => {
+  return conditions.map((condition) => createCondition(condition)(actor)) 
+}
+
+const getAvailableEvents = (actor) => {
+  return events.filter((event) => {
+    const conditions = event?.conditions || []
+    console.log(event);
+    const conditionResults = getConditionResults(actor, conditions)
+    return allConditionsTrue(conditionResults)
+  })
+}
+
+export const pickEventForActor = (actor) => {
+  const availableEvents = getAvailableEvents(actor)
+  return Helper.getRandomInArray(availableEvents)
+}
