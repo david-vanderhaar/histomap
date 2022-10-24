@@ -145,7 +145,7 @@ const Histomap = ({theme, onSwitchTheme}) => {
           </Layer>
         </Stage>
       </div>
-      <Footer theme={theme}/>
+      <Footer theme={theme} description={getModel()['description'] || ''}/>
     </div>
   )
 }
@@ -164,11 +164,11 @@ const StepCounter = ({theme, step_label, total_steps}) => (
 )
 const SubTitle = ({theme, title}) => (<p style={{color: Styles.themes[theme].element_body, textTransform: 'uppercase'}}>{title}</p>)
 
-const Footer = ({theme}) => (
+const Footer = ({theme, description}) => (
   <div className='bottom-section' style={{ height: BOTTOM_SECTION_HEIGHT }}>
     <span style={{ color: Styles.themes[theme].element_body}} className='bottom-section-text'>Copyright by David A. Vanderhaar</span>
     <span style={{ color: Styles.themes[theme].element_body}} className='bottom-section-text'>Made with React and Konva</span>
-    <span style={{ color: Styles.themes[theme].element_body}} className='bottom-section-text'>Model based on Peter Turchin's Cycling in the Complexity of Early Societies</span>
+    <span style={{ color: Styles.themes[theme].element_body}} className='bottom-section-text'>{description}</span>
   </div>
 )
 

@@ -1,5 +1,5 @@
-import { createActor } from './actor'
-import { pickEventForActor, createEventDescription } from './event'
+import * as Actor from './actor'
+import * as Event from './event'
 
 const logger = () => {
   const events = []
@@ -22,14 +22,14 @@ const run = (actors, time = 0) => {
         add event description to history
   */
   const newActors = actors.map((actor) => {
-    const event = pickEventForActor(actor)
+    const event = Event.pickEventForActor(actor)
     const newActor = event.happenTo(actor)
-    const description = createEventDescription(event.description, actor)
+    const description = Event.createEventDescription(event.description, actor)
     newActor.addEvent({event_type: event.name, description, time})
     return newActor
   })
 
-  HISTORY_LOG.add({ time, actors: newActors })
+  // HISTORY_LOG.add({ time, actors: newActors })
   return newActors
 }
 
@@ -47,7 +47,7 @@ const runFor = (times, actors) => {
 const generateActors = (amountToCreate = 3) => {
   return Array(amountToCreate)
     .fill()
-    .map(() => createActor())
+    .map(() => Actor.createActor())
 }
 
 const getPowerPercentages = (actors) => {
