@@ -45,6 +45,16 @@ const ToolbarButton = ({theme, onClick, title, text, ...props}) => {
   )
 }
 
+const ModelToolbarFunctions = ({theme, model}) => {
+  return model?.toolbarFunctionButtons?.length && (
+    <div>
+      {model.toolbarFunctionButtons.map((buttonProps, index) => {
+        return <ToolbarButton key={index} theme={theme} {...buttonProps} />
+      })}
+    </div>
+  )
+}
+
 function Toolbar(props) {
   const handleStartPause = () => {
     if (props.running_sim) {
@@ -122,6 +132,7 @@ function Toolbar(props) {
         }}
         text="Print"
       />
+      <ModelToolbarFunctions theme={props.theme} model={props.getSelectedModel()} />
     </div>
   );
 }

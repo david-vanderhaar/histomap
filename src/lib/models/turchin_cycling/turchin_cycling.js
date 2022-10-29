@@ -614,6 +614,13 @@ export const createPlayerPolity = (color) => { return {...createPolity(color), i
 const immuneToViolence = (polity) => polity.has_incurred_secession && polity.has_incurred_war;
 
 export const description = "Model based on Peter Turchin's Cycling in the Complexity of Early Societies"
+// export const toolbarFunctionButtons = [
+//   {
+//     text: 'Test',
+//     title: 'test',
+//     onClick: () => null,
+//   }
+// ]
 
 const namePrefixes = [
   'Moon',
