@@ -28,6 +28,23 @@ const ModelSelect = ({selected, onSelect, theme}) => {
   )
 }
 
+const ToolbarButton = ({theme, onClick, title, text, ...props}) => {
+  return (
+    <button
+      onClick={onClick}
+      title={title}
+      className="btn"
+      style={{
+        backgroundColor: Styles.themes[theme].element_body,
+        color: Styles.themes[theme].element_text
+      }}
+      {...props}
+    >
+      {text}
+    </button>
+  )
+}
+
 function Toolbar(props) {
   const handleStartPause = () => {
     if (props.running_sim) {
@@ -50,121 +67,61 @@ function Toolbar(props) {
   return (
     <div className="Toolbar">
       <ModelSelect theme={props.theme} onSelect={props.onSelectModel} selected={props.selectedModelName}/>
-      <button
+      <ToolbarButton
+        theme={props.theme}
+        text={props.running_sim ? 'Pause' : 'Auto'}
         onClick={handleStartPause}
-        className="btn"
         title="
           Start/Stop History
           (player politiy decisions will be auto resolved)
         "
-        style={{
-          backgroundColor: Styles.themes[props.theme].element_body,
-          color: Styles.themes[props.theme].element_text
-        }}
-      >
-        {
-          props.running_sim
-            ? 'Pause'
-            : 'Auto'
-        }
-      </button>
-      <button
-        onClick={() => props.onStep()}
-        className="btn"
-        style={{
-          backgroundColor: Styles.themes[props.theme].element_body,
-          color: Styles.themes[props.theme].element_text
-        }}
-      >
-        Step
-      </button>
-      <button
-        onClick={() => props.onRestart()}
-        className="btn"
-        style={{
-          backgroundColor: Styles.themes[props.theme].element_body,
-          color: Styles.themes[props.theme].element_text
-        }}
-      >
-        Restart
-      </button>
-      <button
-        onClick={() => props.onReset()}
-        className="btn"
-        style={{
-          backgroundColor: Styles.themes[props.theme].element_body,
-          color: Styles.themes[props.theme].element_text
-        }}
-      >
-        New History
-      </button>
-      <button
+      />
+      <ToolbarButton
+        theme={props.theme}
+        onClick={props.onStep}
+        text="Step"
+      />
+      <ToolbarButton
+        theme={props.theme}
+        onClick={props.onRestart}
+        text="Restart"
+      />
+      <ToolbarButton
+        theme={props.theme}
+        onClick={props.onReset}
+        text="New History"
+      />
+      <ToolbarButton
+        theme={props.theme}
         disabled
-        onClick={() => props.onAddTurchinPolity()}
-        className="btn"
-        style={{
-          backgroundColor: Styles.themes[props.theme].element_body,
-          color: Styles.themes[props.theme].element_text
-        }}
-      >
-        Add Polity
-      </button>
-      <button
+        onClick={props.onAddTurchinPolity}
+        text="Add Polity"
+      />
+      <ToolbarButton
+        theme={props.theme}
         disabled
-        onClick={() => props.onAddPlayerPolity()}
-        className="btn"
-        style={{
-          backgroundColor: Styles.themes[props.theme].element_body,
-          color: Styles.themes[props.theme].element_text
-        }}
-      >
-        Add Player
-      </button>
-      <button
-        onClick={() => props.onSwitchTheme()}
-        className="btn"
-        style={{
-          backgroundColor: Styles.themes[props.theme].element_body,
-          color: Styles.themes[props.theme].element_text
-        }}
-      >
-        {
-          props.theme === 'light' 
-            ? 'Go Dark' 
-            : 'Go Light'
-        }
-      </button>
-      <button
+        onClick={props.onAddPlayerPolity}
+        text="Add Player"
+      />
+      <ToolbarButton
+        theme={props.theme}
+        onClick={props.onSwitchTheme}
+        text={props.theme === 'light' ? 'Go Dark' : 'Go Light'}
+      />
+      <ToolbarButton
+        theme={props.theme}
         disabled
-        onClick={() => props.onSwitchView()}
-        className="btn"
-        style={{
-          backgroundColor: Styles.themes[props.theme].element_body,
-          color: Styles.themes[props.theme].element_text
-        }}
-      >
-        {
-          props.chart_view
-            ? 'Node View' 
-            : 'Chart View'
-        }
-      </button>
-      {/* <button
+        onClick={props.onSwitchView}
+        text={props.chart_view ? 'Node View'  : 'Chart View'}
+      />
+      <ToolbarButton
+        theme={props.theme}
         onClick={() => {
-            let dataURL = props.stage_ref.current.toDataURL()
-            downloadURI(dataURL, 'the_histomap.png');
-          // console.log(props.stage_ref.current);
-            
-          }
-        }
-        className="btn"
-        style={{
-          backgroundColor: Styles.themes[props.theme].element_body,
-          color: Styles.themes[props.theme].element_text
+          let dataURL = props.stage_ref.current.toDataURL()
+          downloadURI(dataURL, 'the_histomap.png');
         }}
-      >
-        Print
-      </button> */}
+        text="Print"
+      />
     </div>
   );
 }

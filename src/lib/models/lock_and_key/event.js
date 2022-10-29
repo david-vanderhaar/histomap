@@ -83,11 +83,6 @@ export const createEventDescription = (description, actor) =>
 
 export const events = eventJson.map((event) => createEvent(event))
 
-const filterByActorLevel = (actor) => (event) => event.availableToLevels.includes(actor.level)
-
-// export const pickEventForActor = (actor) => Helper.getRandomInArray(events.filter(filterByActorLevel(actor)))
-const getAvailableEventsV1 = (actor) => events.filter(filterByActorLevel(actor))
-
 const getConditionResults = (actor, conditions) => {
   return conditions.map((condition) => createCondition(condition)(actor)) 
 }
@@ -95,7 +90,6 @@ const getConditionResults = (actor, conditions) => {
 const getAvailableEvents = (actor) => {
   return events.filter((event) => {
     const conditions = event?.conditions || []
-    console.log(event);
     const conditionResults = getConditionResults(actor, conditions)
     return allConditionsTrue(conditionResults)
   })

@@ -109,6 +109,7 @@ const Histomap = ({theme, onSwitchTheme}) => {
           onAddPlayerPolity={addPlayerPolity}
           onSelectModel={onSelectModel}
           selectedModelName={DEFAULT_MODEL}
+          getSelectedModel={getModel}
           chart_view={chart_view}
           stage_ref={stage_ref}
           />
