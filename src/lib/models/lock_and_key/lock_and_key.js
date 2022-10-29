@@ -13,6 +13,7 @@ const logger = () => {
 const HISTORY_LOG = logger()
 
 const run = (actors, time = 0) => {
+  const worldState = getWorldState(actors)
   /*
     for NUMBER OF YEARS TO SIMULATE
       for each entity
@@ -31,6 +32,10 @@ const run = (actors, time = 0) => {
 
   // HISTORY_LOG.add({ time, actors: newActors })
   return newActors
+}
+
+const getWorldState = (actors) => {
+  return {actors}
 }
 
 const runFor = (times, actors) => {
