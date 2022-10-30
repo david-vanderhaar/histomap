@@ -23,7 +23,7 @@ import eventJson from './events.js'
   // history (array of events)
 
 const createSetStatToEffect = (stat) => (setTo) => (actor) => actor[stat] = setTo
-const createChangeStatByEffect = (stat) => (changeBy) => (actor) => actor[stat] = Math.max(0.1, actor[stat] + changeBy)
+const createChangeStatByEffect = (stat) => (changeBy) => (actor) => actor[stat] = Math.max(0, actor[stat] + changeBy)
 const createChangeStatByRandomRangeEffect = (stat) => ([min, max]) => (actor) => createChangeStatByEffect(stat)(Helper.getRandomIntInclusive(min, max))(actor)
 const createRandomizeStatBetweenEffect = (stat) => ([min, max]) => (actor) => actor[stat] = Helper.getRandomIntInclusive(min, max)
 const ifStatEquals = (stat) => (value) => (actor) => actor[stat] === value

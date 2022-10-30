@@ -152,17 +152,17 @@ export default [
       {
         "type": "setStatTo",
         "stat": "militaryPower",
-        "value": 0
+        "value": 1
       },
       {
         "type": "setStatTo",
         "stat": "economicPower",
-        "value": 0
+        "value": 1
       },
       {
-        "type": "setStatTo",
+        "type": "changeStatByRandomRange",
         "stat": "level",
-        "value": -1
+        "value": [-5, -1]
       },
     ],
     "conditions": [
