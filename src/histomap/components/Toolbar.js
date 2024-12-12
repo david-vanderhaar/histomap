@@ -79,10 +79,10 @@ function Toolbar(props) {
       <ModelSelect theme={props.theme} onSelect={props.onSelectModel} selected={props.selectedModelName}/>
       <ToolbarButton
         theme={props.theme}
-        text={props.running_sim ? 'Pause' : 'Auto'}
+        text={props.running_sim ? 'Pause' : 'Start'}
         onClick={handleStartPause}
         title="
-          Start/Stop History
+          Start/Pause History
           (player politiy decisions will be auto resolved)
         "
       />
@@ -101,7 +101,7 @@ function Toolbar(props) {
         onClick={props.onReset}
         text="New History"
       />
-      <ToolbarButton
+      {/* <ToolbarButton
         theme={props.theme}
         disabled
         onClick={props.onAddTurchinPolity}
@@ -112,18 +112,18 @@ function Toolbar(props) {
         disabled
         onClick={props.onAddPlayerPolity}
         text="Add Player"
-      />
+      /> */}
       <ToolbarButton
         theme={props.theme}
         onClick={props.onSwitchTheme}
         text={props.theme === 'light' ? 'Go Dark' : 'Go Light'}
       />
-      <ToolbarButton
+      {/* <ToolbarButton
         theme={props.theme}
         disabled
         onClick={props.onSwitchView}
         text={props.chart_view ? 'Node View'  : 'Chart View'}
-      />
+      /> */}
       <ToolbarButton
         theme={props.theme}
         onClick={() => {

@@ -14,7 +14,7 @@ const switchTheme = (theme) => {
 const ref = React.createRef();
 
 function App() {
-  const [theme, setTheme] = useState('light');
+  const [theme, setTheme] = useState('dark');
 
   return (
     <div 

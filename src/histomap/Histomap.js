@@ -1,12 +1,11 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import '../App.css';
 import Models from '../lib/models/models'
 import NodeView from './NodeView';
 import ChartView from './ChartView';
 import Toolbar from './components/Toolbar';
-import { Stage, Layer, Rect, Text } from 'react-konva';
+import { Stage, Layer } from 'react-konva';
 import * as Styles from '../styles';
-import { delay } from "q";
 
 const TOP_SECTION_HEIGHT = 220;
 const BOTTOM_SECTION_HEIGHT = 60;
@@ -88,6 +87,9 @@ const Histomap = ({theme, onSwitchTheme}) => {
     setActors(newActors)
     setHistory(newHsitory)
   }
+
+  // start after mounting
+  useEffect(start, [])
 
   return (
     <div>
